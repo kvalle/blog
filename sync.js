@@ -7,6 +7,8 @@ var _ = require('underscore');
 
 var published_path = './posts/published';
 var public_path = './public/posts';
+var template_string = fs.readFileSync('post.html', 'utf-8');
+var post_template = _.template(template_string);
 
 function get_markdown(raw) {
 	var data = yaml_front.loadFront(raw);
@@ -20,8 +22,7 @@ function process_file(name) {
 	console.log("processing file %s", name);
 	fs.readFile(published_path+'/'+name, 'utf-8', function(err, data) {
 		var markdown = get_markdown(data);
-		var compiled = _.template("<html><head><title>Generated from md by js</title></head><body><%= markdown %></body></html>");
-		var content = compiled({markdown : markdown});
+		var content = post_template({markdown : markdown});
 		var html_file = path.basename(name, '.md')+'.html';
 		var html_path = public_path+'/'+html_file;
 		fs.writeFile(html_path, content, function(err) {
