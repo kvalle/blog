@@ -6,9 +6,11 @@ var _ = require('underscore');
 var q = require('promised-io');
 
 var published_path = './posts/published';
-var public_path = './public/posts';
-var template_string = fs.readFileSync('post.html', 'utf-8');
-var post_template = _.template(template_string);
+var public_path = './public';
+var posts_path = public_path + '/posts';
+
+var post_template = _.template(fs.readFileSync('post.html', 'utf-8'));
+var index_template = _.template(fs.readFileSync('index.html', 'utf-8'));
 
 function parse(raw) {
 	var meta = yaml_front.loadFront(raw);
@@ -25,7 +27,7 @@ function process(filename) {
 		meta['status'] = 'success';
         meta['from_path'] = published_path+'/'+filename;
         var base = path.basename(filename, '.md');
-        meta['to_path'] = public_path+'/'+base+'.html';
+        meta['to_path'] = posts_path+'/'+base+'.html';
         meta['title'] = meta.title || base.replace(/-/g, " ");
 
 		fs.writeFile(meta.to_path, post_template({markdown : meta['markdown']}), function(err) {
@@ -59,4 +61,9 @@ for (var i=0; i<files.length; i++) {
 
 q.all(data).then(function(data) {
 	console.log(data);
+	var html = index_template({blogposts : data})
+	fs.writeFile(public_path+'/index.html', html, function(err) {
+		if (err) throw err;
+		console.log('Saved index.html');
+	});
 })
