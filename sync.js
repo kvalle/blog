@@ -9,8 +9,8 @@ var published_path = './posts/published';
 var public_path = './public';
 var posts_path = public_path + '/posts';
 
-var post_template = _.template(fs.readFileSync('post.html', 'utf-8'));
-var index_template = _.template(fs.readFileSync('index.html', 'utf-8'));
+var post_template = _.template(fs.readFileSync('templates/post.html', 'utf-8'));
+var index_template = _.template(fs.readFileSync('templates/index.html', 'utf-8'));
 
 function parse(raw) {
 	var meta = yaml_front.loadFront(raw);
