@@ -3,44 +3,60 @@ var marked = require('marked');
 var path = require('path');
 var yaml_front = require('yaml-front-matter');
 var _ = require('underscore');
-
+var q = require('promised-io');
 
 var published_path = './posts/published';
 var public_path = './public/posts';
 var template_string = fs.readFileSync('post.html', 'utf-8');
 var post_template = _.template(template_string);
 
-function get_markdown(raw) {
-	var data = yaml_front.loadFront(raw);
-	if (data) {
-		return marked(data['__content']);
+function parse(raw) {
+	var meta = yaml_front.loadFront(raw);
+	if (!meta) {
+		meta = {'__content': raw};
 	}
-	return marked(raw);
+	meta['markdown'] = marked(meta.__content);
+	return meta;
 }
 
-function process_file(name) {
-	console.log("processing file %s", name);
-	fs.readFile(published_path+'/'+name, 'utf-8', function(err, data) {
-		var markdown = get_markdown(data);
-		var content = post_template({markdown : markdown});
-		var html_file = path.basename(name, '.md')+'.html';
-		var html_path = public_path+'/'+html_file;
-		fs.writeFile(html_path, content, function(err) {
+function process(filename) {
+    return function(data) {
+    	var meta = parse(data);
+		meta['status'] = 'success';
+        meta['from_path'] = published_path+'/'+filename;
+        var base = path.basename(filename, '.md');
+        meta['to_path'] = public_path+'/'+base+'.html';
+        meta['title'] = meta.title || base.replace(/-/g, " ");
+
+		fs.writeFile(meta.to_path, post_template({markdown : meta['markdown']}), function(err) {
 			if (err) throw err;
-  			console.log('Saved %s', html_path);
+			console.log('Saved %s', meta.to_path);
 		});
-	});
+
+		delete meta.markdown
+		delete meta.__content
+	    return meta;
+    }
 }
 
-function process_files(files) {
-	for (var i=0; i<files.length; i++) {
-		process_file(files[i]);
-	}
+function error(filename) {
+    return function(data) {
+        return {
+            status: 'failed',
+            from_path: published_path + '/' + filename,
+        }
+    }
 }
 
-// main
+var files = fs.readdirSync(published_path);
+var data = []
 
-fs.readdir(published_path, function(err, files) {
-	if (err) throw err;
-	process_files(files);
-});
+for (var i=0; i<files.length; i++) {
+    var filename = files[i];
+    var promise = q.execute(fs.readFile, published_path+'/'+filename, 'utf-8');
+    data[i] = q.whenPromise(promise, process(filename), error(filename));
+}
+
+q.all(data).then(function(data) {
+	console.log(data);
+})
