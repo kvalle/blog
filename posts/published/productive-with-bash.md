@@ -20,8 +20,7 @@ In this blog post I'll outline some of the features of Bash that have made my da
 Note that the focus here is on working with the actual command line, not writing bash scripts.
 We won't use any complicated comands, just look at the standad basic features available which you might not be using to the fullest.
 
-Learn the keyboard shortcuts
-----------------------------
+## Learn the keyboard shortcuts
 
 The first, and probably most important, thing you can do to improve your Bash skills is to learn the most most useful shortcut.
 
@@ -72,8 +71,7 @@ And in case you really want do dig into how this works — the Bash hotkey suppo
 	$ man readline
 
 
-The "magic" variables
---------------------------
+## The "magic" variables
 
 Bash has a lot of [special variables](http://tldp.org/LDP/abs/html/refcards.html#AEN22165) which names are so arcane, they may seem more like magic incantations when first encountered.
 Although they won't win prizes for readability any time soon, they are very useful in scripts. and a couple of them can at times be useful at the command line as well.
@@ -104,8 +102,7 @@ In such cases, use `$?` to check the return code (errno) of the last returning p
 
 Any value above 0 here means, of course, that there was an error executing the last command.
 
-Move around!
-------------
+## Move around!
 
 One of the most used commands is probably `cd`.
 It's pretty simple — give it an argument and you change your current working directory.
@@ -136,8 +133,7 @@ Lets go back and have a look:
 	$ pwd
 	/home/kjetil/logs
 
-Be many places at once
-----------------------
+## Be many places at once
 
 *TODO*
 
@@ -146,8 +142,7 @@ To take this even further, learn to use the `pushd` and `popd` builtin commands.
 	$ help pushd && help popd
 
 
-Master your history (expansion)
--------------------------------
+## Master your history (expansion)
 
 Every command you run in bash is recorded. 
 It is stored in `~/.bash_history` by default, and can be listed by using the `history` command.
@@ -201,8 +196,7 @@ This is just a very quick overview.
 It would be well worth your time to study [some examples](http://www.thegeekstuff.com/2011/08/bash-history-expansion/) and learn to use them.
 
 
-Redirect Output
----------------
+## Redirect Output
 
 *TODO*
 
@@ -215,8 +209,7 @@ redirect both:   $ do_something.sh &> out.log
 
 -->
 
-Lists and Expansions
---------------------
+## Lists and Expansions
 
 List can be created by using the `{` and `}` characters.
 By using lists you can have a command be executed on each of the items in the list.
@@ -260,8 +253,7 @@ And they can even be nested and concatinated in ways too complex to possibly be 
 	1ax 1ay 1b 3ax 3ay 3b 5ax 5ay 5b
 
 
-Do things in sequence
----------------------
+## Do things in sequence
 
 Sometimes you need to several things in sequence, things that could take a long time.
 Instead of waiting for the first command to finish, then type in the next, it is convenient to tell bash to do the things in sequence.
@@ -279,11 +271,9 @@ Instead we can ue the `&&` operator to make bash run commands in sequence if, an
     $ ./configure && make && make install 
 
 
-Use Controll Structures
------------------------
+## Use Controll Structures
 
-Configure Your Shell
---------------------
+## Configure Your Shell
 
 Everything we have discussed up to now is vanilla out-of-the-box bash, and thus available anywhere you go.
 But inn all likelihood you'll find yourself doing the bulk of your work at your own local shell, and as such it can be a good idea to make it as comfortable as possible.
@@ -307,8 +297,7 @@ Some examples:
 
 For inspiration on how to customzie *your* bash, have a look at the [myriad of dotfiles-repositories on GitHub](https://github.com/search?q=dotfiles).
 
-Wrapup
-------
+## Wrapup
 
 *TODO*
 

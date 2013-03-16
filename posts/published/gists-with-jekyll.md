@@ -33,7 +33,7 @@ was transformed into
 Self closing tags is a [known issue](http://stackoverflow.com/questions/69913/why-dont-self-closing-script-tags-work) with Firefox, and the problem also occurred when I viewed the page in Chrome.
 
 The solution is deceptively simple.
-By adding some content between the `script` tags---a JavaScript comment or a space for example---Maruku no longer views them as empty, and no minimization is performed.
+By adding some content between the `script` tags--a JavaScript comment or a space for example--Maruku no longer views them as empty, and no minimization is performed.
 
 <!-- end preview -->
 

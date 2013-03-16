@@ -13,14 +13,13 @@ The above is also the title of a paper I presented at the [INWWCT](http://events
 The paper presents a graph-based method for document representation.
 It was exciting to be able to present the work, which was part my MSc Thesis.
 
-While [the paper](/pub/inwwct.pdf) of course is available for anyone to read, this post serves as a (rather long) TL;DR --- a summary and cursory introduction to the topic.
+While [the paper](/pub/inwwct.pdf) of course is available for anyone to read, this post serves as a (rather long) TL;DR -- a summary and cursory introduction to the topic.
 I'll briefly explain the problem of text classification, our motivation for exploring better representations, and our method.
 
 The post is crafted from my manuscript from the paper presentation.
 If you are overly fond of bullet points, you may want to look at [the slides](/files/inwwct-slides.pdf) instead.
 
-Text Classification
--------------------
+## Text Classification
 
 The problem of text classification is that of assigning a textual document to one or more categories, based on the contents of the document.
 
@@ -40,8 +39,7 @@ Thus, two documents are represented the exact same way if they contain the same 
 Consider, for example, the two small sentences *“a man bit the dog”* and *“the dog bit a man”*.
 Although the meaning of the two are very distinct indeed, they have the same representation under any bag-of-words model.
 
-Graph-based Representations
----------------------------
+## Graph-based Representations
 
 Since the relationships between terms obviously are important, we wanted to try to create a representation that captured some of this information.
 And, since graphs are a natural choice for representing relations, we decided on a graph-based approach to the problem.
@@ -91,8 +89,7 @@ Even if you are not, the essence of the sentence should be obvious.
 
 ![Dependency graph](/img/graph-representation/stanford-graph.png)
 
-Term Evaluation
----------------
+## Term Evaluation
 
 Once the document is constructed as a network, the next step is to evaluate the nodes to determine the importance of each term.
 To do this, we employ the concept of *node centrality*.
@@ -130,8 +127,7 @@ The second, Term Centrality-Inverse Corpus Centrality (TC-ICC), is inspired by T
 TC-ICC is calculated as the TC value multiplied by the inverse of the term's Corpus Centrality (CC) -- that is, the node centrality of the term in a network constructed from the text of the entire document collection.
 Generally, TC performed better than TC-ICC in this experiment.
 
-The Process Summarized
-----------------------
+## The Process Summarized
 
 Lets briefly summarize the document representation, as outlined so far.
 
@@ -142,8 +138,7 @@ The centrality of each node is then computed, using degree centrality for co-occ
 Based on the node centralities, the importance of each term is estimated as TC or TC-ICC.
 Finally, the TC or TC-ICC values are assembled into a feature-value vectors representing the documents.
 
-Results
--------
+## Results
 
 Our initial series of experiments, including the node centrality measure evaluation described above, was designed to test various aspects of the representations.
 Instead of describing them all here, I'll summarize our findings.

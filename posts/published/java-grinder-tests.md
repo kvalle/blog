@@ -10,7 +10,7 @@ title: Writing Grinder Test Scripts in Java
 published: true
 ---
 
-I've recently been doing quite a bit of performance testing, and my most important tool for this has been [The Grinder](http://grinder.sourceforge.net/)---an open source, lightweight load testing framework.
+I've recently been doing quite a bit of performance testing, and my most important tool for this has been [The Grinder](http://grinder.sourceforge.net/)--an open source, lightweight load testing framework.
 
 Although itself written in Java, Grinder uses Jython (and as of version 3.6 also Closure) for its test scripting engine.
 Python is a great language, and naturally suited for writing this kind of tests.

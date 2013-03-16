@@ -18,8 +18,7 @@ That changed, however, when I was introduced to <a href="https://github.com/mojo
 Jekyll is, according to the documentation, a _simple, blog aware, static site generator_, which means it can generate static HTML pages based on a few templates and some text files.
 This post outlines my experiences using Jekyll to set up this simple site.
 
-The Jekyll Setup
-----------------
+## The Jekyll Setup
 
 The blog rests upon a fairly vanilla Jekyll, and since there already exist a hundred blog posts about how to install and get started with Jekyll, I won't go into that here.
 My only deviation from default Jekyll was that I wanted to show previews rather than the full posts on the front page, and that I wanted somewhat better support for categories.
@@ -75,8 +74,7 @@ In my <a href="/index.html">index.html</a>, the `preview` filter is used as in t
 {% endraw %}
 {% endhighlight %}
 
-Publishing
-----------
+## Publishing
 
 I initially wanted to host the site directly on GitHub, since their <a href="http://pages.github.com/">GitHub Pages</a> feature makes this really easy. 
 All you need to do is:
@@ -108,8 +106,7 @@ This can be done by adding the following simple post-receive hook in the server 
 {% endhighlight %}
 
 
-Code Highlight
---------------
+## Code Highlight
 
 Jekyll offers easy code highlighting out of the box, as long as you install <a href="http://pygments.org/">Pygments</a>.
 
@@ -127,8 +124,7 @@ The default color scheme can be generated using the following command:
 You can of course also change `ruby` to one of the other <a href="http://pygments.org/languages/">languages supported by Pygments</a>.
 
 
-Final Tips
-----------
+## Final Tips
 
 Finally, here are a few other things that can be useful when using Jekyll.
 
