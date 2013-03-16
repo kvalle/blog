@@ -1,0 +1,14 @@
+{ 
+	"name" : "blog", 
+	"author": "Kjetil Valle",
+	"version" : "0.0.1", 
+	"dependencies" : { 
+		"colorize": "~0.1",
+		"marked": "~0.2",
+		"yaml-front-matter": "~1",
+		"underscore": "~1.4",
+		"promised-io": "~0.3"
+	},
+	"main": "generate.js",
+	"private": true
+}

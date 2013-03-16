@@ -1,4 +1,0 @@
-marked
-yaml-front-matter
-underscore
-colorize
