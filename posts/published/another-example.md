@@ -1,7 +1,8 @@
 ---
-title: another example post
+title: Another example post with a very very long title
 date: 2013-01-01
 meta: data
+description: Just another blogpost about something.
 ---
 
 # Foo bar
