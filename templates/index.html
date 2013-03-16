@@ -1,14 +1,43 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<meta charset="utf-8" />
 	<title>Hello Blog</title>
-	<link rel="stylesheet" href="/style.css" />
+	<link rel="stylesheet" href="css/bootstrap.css" />
+	<link rel="stylesheet" href="css/bootstrap-responsive.css" />
+	<link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-	<ul>
-		<% _.each(blogposts, function(post) { %>
-			<li><a href="<%= post.href %>"><%= post.title %></a></li>
-		<% }); %>
-	</ul>
+	<div id="container">
+		<div class="row">
+			<div class="offset8 span4">
+				<h1>Kjetil Valle</h1>
+			</div>
+		</div>
+		<div class="row">
+			<div class="span8">
+				<ul class="posts">
+					<% _.each(blogposts, function(post) { %>
+						<li><a href="<%= post.href %>"><h2><%= post.title %></h2></a></li>
+					<% }); %>
+				</ul>
+			</div>
+			<div class="span4">
+				<aside class="clearfix well">
+					<img style="float: left" src="/img/profile.jpeg" width="90px"/>
+
+		            Software developer at <a href="http://bekk.no">BEKK</a>.
+		            Currently living in Oslo, Norway.<br/>
+				</aside>
+				<aside class="clearfix well">
+					<h2>Elsewhere</h2>
+		            My code is at <a href="http://github.com/kvalle">GitHub</a>,<br/>
+		            what I read at <a href="http://www.goodreads.com/review/list/4053326-kjetil?shelf=read&sort=rating&view=table">Goodreads</a>,<br/>
+		            music I listen to at <a href="http://www.last.fm/user/Fanden">Last.fm</a>,<br/>
+		            and beers I taste at <a href="http://untappd.com/user/valle">Untappd</a>.<br/>
+		            Oh, and I'm at <a href="http://no.linkedin.com/in/kvalle">LinkedIn</a> too.
+				</aside>
+			</div>
+		</div>
+	</div>
 </body>
