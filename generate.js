@@ -16,12 +16,12 @@ var post_template = _.template(fs.readFileSync('templates/post.html', 'utf-8'));
 var index_template = _.template(fs.readFileSync('templates/index.html', 'utf-8'));
 
 function success(filename) {
-    var message = colorize.ansify('#green[\u2713] Processed %s')
+    var message = colorize.ansify('#green[\u2713] %s')
     console.log(message, filename)
 }
 
 function failure(filename, error) {
-    var message = colorize.ansify('#red[\u2717] Processing of %s failed.\n  %s')
+    var message = colorize.ansify('#red[\u2717] %s\n  %s')
     console.log(message, filename, error)
 }
 
