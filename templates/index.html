@@ -8,7 +8,7 @@
 <body>
 	<ul>
 		<% _.each(blogposts, function(post) { %>
-			<li><%= post.title %></li>
+			<li><a href="<%= post.href %>"><%= post.title %></a></li>
 		<% }); %>
 	</ul>
 </body>

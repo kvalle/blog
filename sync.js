@@ -29,6 +29,7 @@ function process(filename) {
         var base = path.basename(filename, '.md');
         meta['to_path'] = posts_path+'/'+base+'.html';
         meta['title'] = meta.title || base.replace(/-/g, " ");
+        meta['href'] = '/posts/'+base+'.html'
 
 		fs.writeFile(meta.to_path, post_template({markdown : meta['markdown']}), function(err) {
 			if (err) throw err;
