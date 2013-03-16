@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 
-var fs = require('fs');
-var marked = require('marked');
-var path = require('path');
-var yaml_front = require('yaml-front-matter');
-var _ = require('underscore');
-var q = require('promised-io');
+var fs = require('fs'),
+	marked = require('marked'),
+	path = require('path'),
+	yaml_front = require('yaml-front-matter'),
+	_ = require('underscore'),
+	q = require('promised-io'),
+	colorize = require('colorize');
 
 var published_path = './posts/published';
 var public_path = './public';
@@ -13,6 +14,16 @@ var posts_path = public_path + '/posts';
 
 var post_template = _.template(fs.readFileSync('templates/post.html', 'utf-8'));
 var index_template = _.template(fs.readFileSync('templates/index.html', 'utf-8'));
+
+function success(filename) {
+	var message = colorize.ansify('#green[\u2713] Processed %s')
+	console.log(message, filename)
+}
+
+function failure(filename, error) {
+	var message = colorize.ansify('#red[\u2717] Processing of %s failed.\n  %s')
+	console.log(message, filename, error)
+}
 
 function parse(raw) {
 	var meta = yaml_front.loadFront(raw);
@@ -35,7 +46,7 @@ function process(filename) {
 
 		fs.writeFile(meta.to_path, post_template({markdown : meta['markdown']}), function(err) {
 			if (err) throw err;
-			console.log('Saved %s', meta.to_path);
+			success(filename);
 		});
 
 		delete meta.markdown
@@ -45,28 +56,31 @@ function process(filename) {
 }
 
 function error(filename) {
-    return function(data) {
+    return function(err) {
+    	failure(filename, err);
         return {
             status: 'failed',
             from_path: published_path + '/' + filename,
+            error: err
         }
     }
 }
 
 var files = fs.readdirSync(published_path);
-var data = []
+var posts = []
 
 for (var i=0; i<files.length; i++) {
     var filename = files[i];
     var promise = q.execute(fs.readFile, published_path+'/'+filename, 'utf-8');
-    data[i] = q.whenPromise(promise, process(filename), error(filename));
+    posts[i] = q.whenPromise(promise, process(filename), error(filename));
 }
 
-q.all(data).then(function(data) {
-	console.log(data);
-	var html = index_template({blogposts : data})
-	fs.writeFile(public_path+'/index.html', html, function(err) {
+q.all(posts).then(function(posts) {
+	//console.log(posts);
+	var html = index_template({blogposts : posts})
+	var path = public_path+'/index.html'
+	fs.writeFile(path, html, function(err) {
 		if (err) throw err;
-		console.log('Saved index.html');
+		success(path);
 	});
 })
