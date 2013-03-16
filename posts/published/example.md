@@ -1,5 +1,6 @@
 ---
 title: an example post
+date: 2013-02-13
 meta: data
 ---
 
