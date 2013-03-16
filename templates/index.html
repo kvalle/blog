@@ -18,16 +18,23 @@
 			<div class="span8">
 				<ul class="posts">
 					<% _.each(blogposts, function(post) { %>
-						<li><a href="<%= post.href %>"><h2><%= post.title %></h2></a></li>
+					<li>
+						<a href="<%= post.href %>">
+							<h2><%= post.title %></h2> 
+							<date><%= post.date.toDateString() %></date><br/>
+							<span class="description"><%= post.description %></span>
+						</a>
+					</li>
 					<% }); %>
 				</ul>
 			</div>
 			<div class="span4">
 				<aside class="clearfix well">
 					<img style="float: left" src="/img/profile.jpeg" width="90px"/>
-
-		            Software developer at <a href="http://bekk.no">BEKK</a>.
-		            Currently living in Oslo, Norway.<br/>
+		            <p>
+		            	Software developer at <a href="http://bekk.no">BEKK</a>.
+		            	Currently living in Oslo, Norway.<br/>
+		            </p>
 				</aside>
 				<aside class="clearfix well">
 					<h2>Elsewhere</h2>
