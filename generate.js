@@ -51,6 +51,9 @@ function process(filename) {
         var base = path.basename(filename, '.md');
         meta['title'] = meta.title || title_from_filename(base);
         meta['href'] = '/posts/'+base+'.html'
+        if (meta.date) {
+            meta['date'] = meta.date.toDateString();
+        }
 
         fs.writeFile(posts_path+'/'+base+'.html', post_template({markdown : meta['markdown']}), function(err) {
             if (err) throw err;
@@ -81,7 +84,7 @@ for (var i=0; i<files.length; i++) {
 
 q.all(posts).then(function(posts) {
     posts = posts.filter(function (p) {return p})
-    console.log(posts);
+    //console.log(posts);
     var html = index_template({blogposts : posts})
     var path = public_path+'/index.html'
     fs.writeFile(path, html, function(err) {
