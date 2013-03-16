@@ -34,6 +34,12 @@ function parse(raw) {
     return meta;
 }
 
+function title_from_filename(base) {
+    title = base.replace(/-/g, " ");
+    title = title[0].toUpperCase() + title.slice(1);
+    return title;
+}
+
 function process(filename) {
     return function(data) {
         try {
@@ -42,13 +48,11 @@ function process(filename) {
             failure(filename, err);
             return false;
         }
-        meta['from_path'] = published_path+'/'+filename;
         var base = path.basename(filename, '.md');
-        meta['to_path'] = posts_path+'/'+base+'.html';
-        meta['title'] = meta.title || base.replace(/-/g, " ");
+        meta['title'] = meta.title || title_from_filename(base);
         meta['href'] = '/posts/'+base+'.html'
 
-        fs.writeFile(meta.to_path, post_template({markdown : meta['markdown']}), function(err) {
+        fs.writeFile(posts_path+'/'+base+'.html', post_template({markdown : meta['markdown']}), function(err) {
             if (err) throw err;
             success(filename);
         });
@@ -77,7 +81,7 @@ for (var i=0; i<files.length; i++) {
 
 q.all(posts).then(function(posts) {
     posts = posts.filter(function (p) {return p})
-    //console.log(posts);
+    console.log(posts);
     var html = index_template({blogposts : posts})
     var path = public_path+'/index.html'
     fs.writeFile(path, html, function(err) {
