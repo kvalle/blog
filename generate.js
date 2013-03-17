@@ -52,7 +52,10 @@ function process(filename) {
         meta['title'] = meta.title || title_from_filename(base);
         meta['href'] = '/posts/'+base+'.html'
         if (meta.date) {
-            meta['date'] = meta.date.toDateString();
+            meta['date_string'] = meta.date.toDateString();
+        } else {
+            failure(filename, "No date specified.");
+            return false;
         }
 
         fs.writeFile(posts_path+'/'+base+'.html', post_template({markdown : meta['markdown']}), function(err) {
@@ -83,8 +86,8 @@ for (var i=0; i<files.length; i++) {
 }
 
 q.all(posts).then(function(posts) {
-    posts = posts.filter(function (p) {return p})
-    //console.log(posts);
+    posts = posts.filter(function (p) {return p});
+    posts = posts.sort(function(p1, p2) {return (p2.date - p1.date)});
     var html = index_template({blogposts : posts})
     var path = public_path+'/index.html'
     fs.writeFile(path, html, function(err) {
