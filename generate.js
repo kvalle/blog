@@ -50,7 +50,14 @@ function process(filename) {
         }
         var base = path.basename(filename, '.md');
         meta['title'] = meta.title || title_from_filename(base);
-        meta['href'] = '/posts/'+base+'.html'
+        if (meta.external) {
+            meta['href'] = meta.external
+        } else {
+            meta['href'] = '/posts/'+base+'.html'
+        }
+        if (meta.description) {
+            meta['description'] = marked(meta.description);
+        }
         if (meta.date) {
             meta['date_string'] = meta.date.toDateString();
         } else {
