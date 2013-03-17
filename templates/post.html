@@ -1,10 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<meta charset="utf-8" />
-	<title>Generated from md by js</title>
-	<link rel="stylesheet" href="/style.css" />
+	<title>Kjetil Valle | Blog</title>
+	<link rel="stylesheet" href="/css/bootstrap.css" />
+	<link rel="stylesheet" href="/css/bootstrap-responsive.css" />
+	<link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
-	<%= markdown %>
+	<div id="container">
+		<div class="row">
+			<div class="offset8 span4">
+				<h1>Kjetil Valle</h1>
+			</div>
+		</div>
+		<div class="row">
+			<div class="span8">
+				<%= markdown %>
+			</div>
+			<div class="span4">
+				<aside class="well">
+					foo?<br>
+					bar<br>
+					<br>
+					<br>
+					baz<br>
+					<br>
+					lol<br>
+				</aside>
+			</div>
+		</div>
+	</div>
 </body>
+</html>

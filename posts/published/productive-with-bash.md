@@ -7,7 +7,7 @@ description: Working in the shell is pretty effective, but it can always be more
 # Make your life easier in Bash
 
 Most of us use Bash more or less every day.
-Even if you develop on Windows you are probably using Cygwin, and chances are you deploy your code to a Unix server.
+Even if you develop on Windows you are probably using Cygwin, and chances are you deploy your code to a Unix server anyway.
 
 Bash might, arguably, not be the best shell out there, but it has one great strength — it is installed as default almost everywhere!
 This makes it the one shell it really pays off to be proficient in.
@@ -19,6 +19,7 @@ We won't use any complicated comands, just look at the standad basic features av
 ## Learn the keyboard shortcuts
 
 The first, and probably most important, thing you can do to improve your Bash skills is to learn the most most useful shortcut.
+This might sound boring, but it's probably the one thing that will give you the most bang for the buck.
 
 Some people choose to swith Bash to use the *vi editing mode* (you can do this by typing `set -o vi`), but I prefer to keep the defaults Emacs mode since that is the standard and thus what most people use.
 
