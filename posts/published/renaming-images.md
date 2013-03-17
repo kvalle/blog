@@ -1,12 +1,7 @@
 ---
-layout: post
-categories: 
-    - Python
-    - scripting
-    - images
 date: 2012-05-27
 title: Taming the photo collection
-published: true
+description: Organizing photos from different devices using different naming schemes can be a pain. So I wrote a tool to deal with this for me.
 ---
 
 I recently decided to organize my steadily growing collection of photos.

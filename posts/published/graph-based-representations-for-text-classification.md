@@ -1,12 +1,7 @@
 ---
-layout: post
-categories: 
-    - text representation
-    - graphs
-    - paper
 date: 2011-10-11
 title: Graph-based Representations for Text Classification
-published: true
+description: "TL;DR of a significant portion of my MSc thesis on how to use graphs to extract information from textual documents in order to improve text classification."
 ---
 
 The above is also the title of a paper I presented at the [INWWCT](http://events.idi.ntnu.no/inwwct2011/ "India-Norway Workshop on Web Concepts and Technologies") at [NTNU](http://www.ntnu.edu "Norwegian University of Science and Technology") last Monday.

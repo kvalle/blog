@@ -1,12 +1,7 @@
 ---
-layout: post
-categories: 
-    - meta
-    - jekyll
-    - git
 date: 2011-09-05
 title: Blogging with Jekyll & Git
-published: true
+description: "So, I started a blog. This is how it works."
 ---
 
 Yeah, so I finally created a blog. 
@@ -29,7 +24,7 @@ To iterate over the available categories -- and much more -- use the <a href="ht
 
 To create post previews to show on the front page, I wrote the following simple plugin.
 
-{% highlight ruby linenos %}
+```ruby
 require 'nokogiri'
 
 module Liquid
@@ -53,9 +48,7 @@ module Liquid
     Liquid::Template.register_filter(ExtendedFilters)
 
 end
-{% endhighlight %}
-
-<!-- end preview -->
+```
 
 All it does is to add two additional filters for use with liquid.
 The `html_first_par` filter extracts the first paragraph from a piece of HTML.
@@ -64,15 +57,13 @@ If it finds no such comment, it simply uses the first filter to extract the firs
 
 In my <a href="/index.html">index.html</a>, the `preview` filter is used as in the following (somewhat simplified) example.
 
-{% highlight html %}
-{% raw %}
+```html
 {% for post in paginator.posts %}
     <h1><a href="{{ post.url }}">{{ post.title }}</a></h1>
     {{ post.content | preview }}
     <a href="{{ post.url }}">Read More</a>
 {% endfor %}
-{% endraw %}
-{% endhighlight %}
+```
 
 ## Publishing
 
@@ -97,13 +88,13 @@ The setup here is slightly more elaborate than with GitHub pages.
 After installing the essentials such as git and a webserver, all we need to do is make Git run Jekyll automatically.
 This can be done by adding the following simple post-receive hook in the server repository:
 
-{% highlight bash %}
-    #!/bin/sh
-    GIT_WORK_TREE=/path/to/blog git checkout -f
-    cd /path/to/blog
-    rm -rf _site/
-    jekyll --no-auto
-{% endhighlight %}
+```bash
+#!/bin/sh
+GIT_WORK_TREE=/path/to/blog git checkout -f
+cd /path/to/blog
+rm -rf _site/
+jekyll --no-auto
+```
 
 
 ## Code Highlight

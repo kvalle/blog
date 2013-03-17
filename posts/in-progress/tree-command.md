@@ -1,11 +1,7 @@
 ---
-layout: post
-categories: 
-    - tooltip
-    - command line
 date: 2012-05-16
 title: "Tooltip: the tree command"
-published: true
+description: The tree command is great for visualizing file and directory hierarchies.
 ---
 
 From time to time, I need to describe a directory structure to someone.

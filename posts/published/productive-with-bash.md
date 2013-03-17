@@ -1,11 +1,7 @@
 ---
-layout: post
-categories: 
-    - command line
-    - bash
 date: 2012-11-30
 title: Make your life easier in Bash
-published: false
+description: Working in the shell is pretty effective, but it can always be more so. This blogpost outlines some of the things that have made my life easier.
 ---
 
 # Make your life easier in Bash

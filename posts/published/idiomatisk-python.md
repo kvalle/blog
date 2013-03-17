@@ -1,12 +1,8 @@
 ---
-layout: post
-categories: 
-    - python
 title: Idiomatisk Python
 date: 2012-09-21
-published: true
-note: open.bekk.no, in norwegian
 external: http://open.bekk.no/idiomatisk-python/
+description: "*In norwegian.* Diskusjon av hva som menes med *pythonisk* kode, og hvordan en spiller på de styrkene Python har, i stedet for å bare skrive Java eller C med en litt penere syntaks."
 ---
 
 This post was published (in norwegian) at [open.bekk.no](http://open.bekk.no/idiomatisk-python/).

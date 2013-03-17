@@ -1,13 +1,7 @@
 ---
-layout: post
-categories: 
-    - text encoding
-    - file
-    - iconv
-    - command line
 date: 2011-10-31
-title: Changing the Encoding of a Text File
-published: true
+title: Working with text encoding from the command line
+description: "Everyone has a horror story about text encoding. Fortunately, in many cases all you need is the command line and two simple commands: `file` and `iconv`."
 ---
 
 Today I was faced with the follwing task: given a directory of files of various and unknown encodings, convert them all to UTF-8.
