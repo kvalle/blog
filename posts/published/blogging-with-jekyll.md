@@ -4,6 +4,8 @@ title: Blogging with Jekyll & Git
 description: "So, I started a blog. This is how it works."
 ---
 
+# Blogging with Jekyll & Git
+
 Yeah, so I finally created a blog. 
 I have been meaning to do this for some time now, but never really got around to it.
 The reason for that -- I think -- is at least partly because I find the mass of CMSs and blog engines out there genuinely unappealing.
@@ -15,7 +17,7 @@ This post outlines my experiences using Jekyll to set up this simple site.
 
 ## The Jekyll Setup
 
-The blog rests upon a fairly vanilla Jekyll, and since there already exist a hundred blog posts about how to install and get started with Jekyll, I won't go into that here.
+The blog rests upon a fairly vanilla Jekyll, and since there already exist a hundred blog posts about how to install and get started with Jekyll, I won't go into that here.Embedding GitHub gists with Jekyll
 My only deviation from default Jekyll was that I wanted to show previews rather than the full posts on the front page, and that I wanted somewhat better support for categories.
 
 For the category support I found some <a href="https://github.com/josegonzalez/josediazgonzalez.com/tree/master/_plugins">plugins</a> that solved my problems.
@@ -119,7 +121,7 @@ You can of course also change `ruby` to one of the other <a href="http://pygment
 
 Finally, here are a few other things that can be useful when using Jekyll.
 
-*   To display liquid samples without them being parsed, surround with &#123;% `literal` %&#125; and &#123;% `endliteral` %&#125; tags.
+*   To display liquid samples without them being parsed, surround with `{% literal %}` and `{% endliteral %}` tags.
 *   Running Jekyll as a server continuously watching for changes and rebuilding is a great way to view the state of your site while working. 
     However,  the `--auto` option may also hide errors from you. 
     If Jekyll fails while building the site, you'll be looking at the last working version -- not an error message!

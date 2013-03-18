@@ -4,6 +4,8 @@ date: 2012-01-03
 description: "When writing blog posts with Jekyll, Firefox would choke on the HTML. This is how you fix it."
 ---
 
+# Embedding GitHub gists with Jekyll
+
 > Update: Since writing this post, I've started using the [Gist Tag for Jekyll](http://brandontilley.com/2011/01/30/gist-tag-for-jekyll.html) by Brandon Tilley.
 > This is a plugin for Jekyll which solves the problem mentioned below, and provides additional goodies like caching and `<noscript>` tags for RSS readers.*
 

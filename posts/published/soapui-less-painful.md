@@ -4,14 +4,20 @@ title: Making SoapUI a bit less painful
 description: "SoapUI is a horrible tool. Unfortunately it's the best one we have. Learn a few useful shortcuts which will make your life a bit less painful while working with it."
 ---
 
+# Making SoapUI a bit less painful
+
 At work, one of the applications I work with is talking to other systems using web services. 
 As such, I frequently find myself having to manually send large SOAP messages and look at the their responses.
 For this work, we usually use [SoapUI](http://www.soapui.org), which keeps track of the contracts, endpoints, and our message templates. 
+
+## The good
 
 SoapUI has many fine qualities. First of all, it's free. Both free as in beer, and free as in open source under the [LGPL](http://www.gnu.org/copyleft/lesser.html) license. It allows us to organize our contracts and message templates into projects, and also supports automation of often repeated tasks, using Groovy as scripting language.
 
 Besides manual testing, we use SoapUI to create simple end-to-end integration tests. 
 These tests are run by our continuous integration server, and provide quick and very useful feedback in form of big red lights whenever anything major breaks.
+
+## The bad
 
 Despite these good qualities, however, SoapUI can at times be a pain to work with.
 The GUI leaves a lot to be wanted in several areas.
@@ -21,9 +27,10 @@ Furthermore, SoapUI forces the user to use the mouse for a lot of the actions, w
 [The documentation](http://www.soapui.org/Getting-Started/10-tips-for-the-soapui-beginner/Tip-1-Right-Click-your-way-around.html) even states that "SoapUI is all about right clicking".
 
 All this pointing and clicking can be slow and tiresome, and for some of us [literally quite painful](http://en.wikipedia.org/wiki/Repetitive_strain_injury).
-<!-- end preview -->
 To remedy this, I have made an effort to find and learn any useful keyboard shortcut available.
 Listed below are the shortcuts I have found I use the most to make working with SoapUI a little less painful.
+
+## The shortcuts
 
 Shortcuts for working with and sending requests:
 

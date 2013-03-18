@@ -4,6 +4,8 @@ title: Taming the photo collection
 description: Organizing photos from different devices using different naming schemes can be a pain. So I wrote a tool to deal with this for me.
 ---
 
+## Taming the photo collection
+
 I recently decided to organize my steadily growing collection of photos.
 It turns out I had over 20.000 photos collected during the last 10 year or so.
 Organizing such an amount of images is in itself a daunting task, but the situation was further compounded by the fact that the images originated from a myriad of different sources, such as my camera phone, my compact camera, and so on.

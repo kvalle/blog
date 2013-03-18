@@ -4,15 +4,16 @@ title: Graph-based Representations for Text Classification
 description: "TL;DR of a significant portion of my MSc thesis on how to use graphs to extract information from textual documents in order to improve text classification."
 ---
 
+# Graph-based Representations for Text Classification
+
 The above is also the title of a paper I presented at the [INWWCT](http://events.idi.ntnu.no/inwwct2011/ "India-Norway Workshop on Web Concepts and Technologies") at [NTNU](http://www.ntnu.edu "Norwegian University of Science and Technology") last Monday.
 The paper presents a graph-based method for document representation.
 It was exciting to be able to present the work, which was part my MSc Thesis.
 
-While [the paper](/pub/inwwct.pdf) of course is available for anyone to read, this post serves as a (rather long) TL;DR -- a summary and cursory introduction to the topic.
+While [the paper](/files/inwwct.pdf) of course is available for anyone to read, this post serves as a (rather long) TL;DR -- a summary and cursory introduction to the topic.
 I'll briefly explain the problem of text classification, our motivation for exploring better representations, and our method.
 
 The post is crafted from my manuscript from the paper presentation.
-If you are overly fond of bullet points, you may want to look at [the slides](/files/inwwct-slides.pdf) instead.
 
 ## Text Classification
 
@@ -155,6 +156,6 @@ We stress the fact that this of course only is a preliminary study.
 Our experiments only covered two datasets, after all.
 However, we believe these results to be an indication that this graph-based approach might have some merit, and perhaps be a way to improve document representations for text classification.
 
-*By the way, if you're still reading this, and is interested in more, <a href="/pub/thesis.pdf">my MSc thesis</a> is also available.*
+*By the way, if you're still reading this, and is interested in more, <a href="/files/thesis.pdf">my MSc thesis</a> is also available.*
 *It discusses everything from this post and the paper, but focus on representations for texutal Case-Based Reasoning.*
 
