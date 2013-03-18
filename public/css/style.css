@@ -32,6 +32,14 @@ h1 {
 	display: inline;
 }
 
+.posts li h2 i {
+	color: #E3E3E3;
+}
+
+.posts li:hover h2 i {
+	color: #AAA;
+}
+
 .posts li date {
 	display: inline-block;
 }
@@ -54,4 +62,30 @@ aside img {
 
 aside a {
 	font-weight: bold;
+}
+
+
+/* blogpost styling */
+
+.blogpost .content {
+  min-height: 20px;
+  padding: 19px;
+  margin-bottom: 20px;
+  background-color: white;
+  border: 1px solid #e3e3e3;
+  
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+  -webkit-box-shadow: inset 2px 1px 1px rgba(0, 0, 0, 0.05);
+     -moz-box-shadow: inset 2px 1px 1px rgba(0, 0, 0, 0.05);
+          box-shadow: inset 2px 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.blogpost h2 i {
+	color: #E3E3E3;
+}
+
+.blogpost h2:hover i {
+	color: #AAA;
 }

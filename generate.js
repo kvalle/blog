@@ -65,7 +65,7 @@ function process(filename) {
             return false;
         }
 
-        fs.writeFile(posts_path+'/'+base+'.html', post_template({markdown : meta['markdown']}), function(err) {
+        fs.writeFile(posts_path+'/'+base+'.html', post_template({post : meta}), function(err) {
             if (err) throw err;
             success(filename);
         });
