@@ -6,7 +6,8 @@ var fs = require('fs'),
     yaml_front = require('yaml-front-matter'),
     _ = require('underscore'),
     q = require('promised-io'),
-    colorize = require('colorize');
+    colorize = require('colorize'),
+    highlight = require('highlight.js');
 
 var published_path = './posts/published';
 var public_path = './public';
@@ -15,22 +16,53 @@ var posts_path = public_path + '/posts';
 var post_template = _.template(fs.readFileSync('templates/post.html', 'utf-8'));
 var index_template = _.template(fs.readFileSync('templates/index.html', 'utf-8'));
 
+marked.setOptions({
+    langPrefix: "language-",
+    highlight: function (code, lang) {
+        if (lang) {
+            try {
+                return highlight.highlight (lang, code).value   
+            } catch (ex) {
+                warning("Had trouble with code block marked: " + lang);
+            }
+        }
+        return code
+    }
+});
+
 function success(filename) {
     var message = colorize.ansify('#green[\u2713] %s')
     console.log(message, filename)
 }
 
-function failure(filename, error) {
-    var message = colorize.ansify('#red[\u2717] %s\n  %s')
-    console.log(message, filename, error)
+function warning(warning) {
+    var message = colorize.ansify('#yellow[\u2717] %s')
+    console.log(message, warning)
 }
 
-function parse(raw) {
+function failure(filename, error) {
+    var message = colorize.ansify('#red[\u2620] %s\n  %s')
+    console.log(message, filename, error)
+    return false;
+}
+
+function parse(raw, filename) {
     var meta = yaml_front.loadFront(raw);
     if (!meta) {
-        meta = {'__content': raw};
+        return failure(filename, "Could not parse front matter.");
     }
+    if (!meta.date) {
+        return failure(filename, "No date specified.");
+    }
+    var base = path.basename(filename, '.md');
     meta['markdown'] = marked(meta.__content);
+    meta['date_string'] = meta.date.toDateString();
+    meta['title'] = meta.title || title_from_filename(base);
+    meta['href'] = meta.external || '/posts/'+base+'.html'
+    if (meta.description) {
+        meta['description'] = marked(meta.description);
+    }
+
     return meta;
 }
 
@@ -42,29 +74,12 @@ function title_from_filename(base) {
 
 function process(filename) {
     return function(data) {
-        try {
-            var meta = parse(data);
-        } catch (err) {
-            failure(filename, err);
-            return false;
-        }
-        var base = path.basename(filename, '.md');
-        meta['title'] = meta.title || title_from_filename(base);
-        if (meta.external) {
-            meta['href'] = meta.external
-        } else {
-            meta['href'] = '/posts/'+base+'.html'
-        }
-        if (meta.description) {
-            meta['description'] = marked(meta.description);
-        }
-        if (meta.date) {
-            meta['date_string'] = meta.date.toDateString();
-        } else {
-            failure(filename, "No date specified.");
-            return false;
+        var meta = parse(data, filename);
+        if (!meta) {
+            return failure(filename, err);
         }
 
+        var base = path.basename(filename, '.md');
         fs.writeFile(posts_path+'/'+base+'.html', post_template({post : meta}), function(err) {
             if (err) throw err;
             success(filename);
@@ -78,8 +93,7 @@ function process(filename) {
 
 function error(filename) {
     return function(err) {
-        failure(filename, err);
-        return false
+        return failure(filename, err);
     }
 }
 
@@ -99,6 +113,6 @@ q.all(posts).then(function(posts) {
     var path = public_path+'/index.html'
     fs.writeFile(path, html, function(err) {
         if (err) throw err;
-        success(path);
+        success("index.html");
     });
 })
