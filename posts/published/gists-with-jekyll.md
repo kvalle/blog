@@ -17,13 +17,13 @@ After quite a while of debugging and searching for answers, I found the problem.
 It would seem that [Maruku](https://github.com/nex3/maruku), the Markdown interpreter used by Jekyll, minimizes empty HTML tags. 
 Thus, my
 
-```html
+```
 <script src="..."></script>
 ```
 
 was transformed into
 
-```html
+```
 <script src="..." />
 ```
 

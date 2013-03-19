@@ -59,7 +59,7 @@ If it finds no such comment, it simply uses the first filter to extract the firs
 
 In my <a href="/index.html">index.html</a>, the `preview` filter is used as in the following (somewhat simplified) example.
 
-```html
+```
 {% for post in paginator.posts %}
     <h1><a href="{{ post.url }}">{{ post.title }}</a></h1>
     {{ post.content | preview }}
