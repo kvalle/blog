@@ -41,13 +41,18 @@ function warning(warning) {
 }
 
 function failure(filename, error) {
-    var message = colorize.ansify('#red[\u2620] %s\n  %s')
+    var message = colorize.ansify('#red[\u203D] %s\n  \u21D2 %s')
     console.log(message, filename, error)
     return false;
 }
 
 function parse(raw, filename) {
-    var meta = yaml_front.loadFront(raw);
+    try {
+        var meta = yaml_front.loadFront(raw);
+    } catch (ex) {
+        return failure(filename, "Could not parse front matter.");    
+    }
+    
     if (!meta) {
         return failure(filename, "Could not parse front matter.");
     }
@@ -55,7 +60,11 @@ function parse(raw, filename) {
         return failure(filename, "No date specified.");
     }
     var base = path.basename(filename, '.md');
-    meta['markdown'] = marked(meta.__content);
+    try {
+        meta['markdown'] = marked(meta.__content);
+    } catch (ex) {
+        return failure(filename, "Could not parse markdown.");
+    }
     meta['date_string'] = meta.date.toDateString();
     meta['title'] = meta.title || title_from_filename(base);
     meta['href'] = meta.external || '/posts/'+base+'.html'
@@ -76,7 +85,7 @@ function process(filename) {
     return function(data) {
         var meta = parse(data, filename);
         if (!meta) {
-            return failure(filename, err);
+            return false;
         }
 
         var base = path.basename(filename, '.md');
