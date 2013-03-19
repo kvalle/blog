@@ -106,11 +106,18 @@ function error(filename) {
     }
 }
 
-var files = fs.readdirSync(published_path);
+var existing_files = fs.readdirSync(posts_path);
+for (var i=0; i<existing_files.length; i++) {
+    var html_file = posts_path + '/' + existing_files[i];
+    if (path.extname(html_file) == "html")
+        fs.unlinkSync(html_file);
+}
+
+var md_files = fs.readdirSync(published_path);
 var posts = []
 
-for (var i=0; i<files.length; i++) {
-    var filename = files[i];
+for (var i=0; i<md_files.length; i++) {
+    var filename = md_files[i];
     var promise = q.execute(fs.readFile, published_path+'/'+filename, 'utf-8');
     posts[i] = q.whenPromise(promise, process(filename), error(filename));
 }
