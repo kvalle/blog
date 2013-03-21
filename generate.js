@@ -9,7 +9,7 @@ var fs = require('fs'),
     colorize = require('colorize'),
     highlight = require('highlight.js');
 
-var published_path = './posts/published';
+var published_path = './posts';
 var public_path = './public';
 var posts_path = public_path + '/posts';
 
