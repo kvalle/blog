@@ -1,10 +1,10 @@
 ---
-date: 2012-11-30
-title: Make your life easier in Bash
+date: 2013-04-04
+title: Learn the Bash command line essentials
 description: Working in the shell is pretty effective, but it can always be more so. This blogpost outlines some of the things that have made my life easier.
 ---
 
-# Make your life easier in Bash
+# Learn the Bash command line essentials
 
 Most of us use Bash more or less every day.
 Even if you develop on Windows you are probably using Cygwin, and chances are you deploy your code to a Unix server anyway.
@@ -15,6 +15,21 @@ In this blog post I'll outline some of the features of Bash that have made my da
 
 Note that the focus here is on working with the actual command line, not writing bash scripts.
 We won't use any complicated comands, just look at the standad basic features available which you might not be using to the fullest.
+
+## Understand I/O redirection
+
+If there is one single thing that, once you understand it, everything else will sort of magically fall into place, then that ting is how I/O redirection in Bash works.
+
+<!--
+pipes
+
+http://www.tldp.org/LDP/abs/html/io-redirection.html
+
+redirect stdout: $ do_something.sh > out.log
+redirect stderr: $ do_something.sh 2> out.log
+redirect both:   $ do_something.sh &> out.log
+
+-->
 
 ## Learn the keyboard shortcuts
 
@@ -192,19 +207,6 @@ Especially [modifiers](http://www.gnu.org/software/bash/manual/bash.html#Modifie
 This is just a very quick overview.
 It would be well worth your time to study [some examples](http://www.thegeekstuff.com/2011/08/bash-history-expansion/) and learn to use them.
 
-
-## Redirect Output
-
-*TODO*
-
-<!--
-pipes
-
-redirect stdout: $ do_something.sh > out.log
-redirect stderr: $ do_something.sh 2> out.log
-redirect both:   $ do_something.sh &> out.log
-
--->
 
 ## Lists and Expansions
 
