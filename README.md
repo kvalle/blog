@@ -1,0 +1,1 @@
+The source for my blog [kjetilvalle.com](http://kjetilvalle.com).
