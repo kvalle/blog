@@ -109,8 +109,9 @@ function error(filename) {
 var existing_files = fs.readdirSync(posts_path);
 for (var i=0; i<existing_files.length; i++) {
     var html_file = posts_path + '/' + existing_files[i];
-    if (path.extname(html_file) == "html")
+    if (path.extname(html_file) == ".html") {
         fs.unlinkSync(html_file);
+    }
 }
 
 var md_files = fs.readdirSync(published_path);
