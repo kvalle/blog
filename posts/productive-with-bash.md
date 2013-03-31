@@ -33,10 +33,11 @@ redirect both:   $ do_something.sh &> out.log
 
 ## Learn the keyboard shortcuts
 
-The first, and probably most important, thing you can do to improve your Bash skills is to learn the most most useful shortcut.
-This might sound boring, but it's probably the one thing that will give you the most bang for the buck.
+The second most important thing you can learn, in my belief, is actually something as simple as the keybindings.
+This might sound boring, but it will most certainly give you bang for the bucks.
 
-Some people choose to swith Bash to use the *vi editing mode* (you can do this by typing `set -o vi`), but I prefer to keep the defaults Emacs mode since that is the standard and thus what most people use.
+If you're an Emacs user, most of the bindings should already be familiar to you, since bash by default is in *emacs-mode*.
+Hardcore Vim users might wish to change to the *vi editing mode* (you can do this by typing `set -o vi`), but I prefer to learn the defaults since is what most people will be using.
 
 This list is by no means exhaustive, but should cover most of the keyboard shortcuts you'll be likely to use.
 Lets start with the most basic ones:
