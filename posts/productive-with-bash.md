@@ -14,22 +14,42 @@ This makes it the one shell it really pays off to be proficient in.
 In this blog post I'll outline some of the features of Bash that have made my day-to-day work in the command line much more productive.
 
 Note that the focus here is on working with the actual command line, not writing bash scripts.
-We won't use any complicated comands, just look at the standad basic features available which you might not be using to the fullest.
+We won't use any complicated commands, just look at the standad basic features available which you might not be using to the fullest.
 
 ## Understand I/O redirection
 
-If there is one single thing that, once you understand it, everything else will sort of magically fall into place, then that ting is how I/O redirection in Bash works.
+If there is one single thing that, once you understand it, everything else will sort of magically fall into place, then that ting is how redirection of inputs and outputs in Bash works.
 
-<!--
-pipes
+Working with I/O in bash is working with files.
+There are three files which you'll always have open by default: `stdin` (input from the keyboard), `stdout` (output to the screen) and `stderr` (error messages output to the screen).
+You can also open additional files.
+I/O redirection is nothing more than to capture the output from a file/command/script and sending it as input to another file/command/script.
 
-http://www.tldp.org/LDP/abs/html/io-redirection.html
+### Pipes
 
-redirect stdout: $ do_something.sh > out.log
-redirect stderr: $ do_something.sh 2> out.log
-redirect both:   $ do_something.sh &> out.log
+The simplest form of I/O redirection is perhaps *piping*.
+Using the pipe character (`|`) you can redirect the outputs from one command to be the inputs of another command.
+What happens is that the `stdout` of the first process is pointed to the `stdin` of the next process, and so on.
 
--->
+Consider the following example:
+
+	$ cat logfile | grep ERROR | sort
+
+The first command, `cat`, reads the contents of a file and prints them to `stdout`.
+We pipe the outputs, which means that `stdout` is now not the screen but `stdin` for the next command. 
+Thus, `grep` reads the printed file as its inputs and filters those lines containing the word ERROR.
+The filtered lines are next piped to `sort` which reads and sort them before they are finally printed to the screen.
+
+### File descriptors
+
+Every open file is assigned a file descriptor.
+These descriptors are numbers the operating system assigns to open files, and can be considered a sort of simplified file pointer.
+The descriptors 0, 1 and 2 refers to `stdin`, `stdout` and `stderr`, respectively.
+The descriptors 3 through 9 remain for additional files opened.
+
+TODO
+
+<!-- http://www.tldp.org/LDP/abs/html/io-redirection.html -->
 
 ## Learn the keyboard shortcuts
 
@@ -37,7 +57,7 @@ The second most important thing you can learn, in my belief, is actually somethi
 This might sound boring, but it will most certainly give you bang for the bucks.
 
 If you're an Emacs user, most of the bindings should already be familiar to you, since bash by default is in *emacs-mode*.
-Hardcore Vim users might wish to change to the *vi editing mode* (you can do this by typing `set -o vi`), but I prefer to learn the defaults since is what most people will be using.
+Hardcore Vim users might wish to change to the *vi editing mode* (you can do this by typing `set -o vi`), but I prefer to learn the defaults since that is what most people will be using.
 
 This list is by no means exhaustive, but should cover most of the keyboard shortcuts you'll be likely to use.
 Lets start with the most basic ones:
@@ -155,7 +175,7 @@ To take this even further, learn to use the `pushd` and `popd` builtin commands.
 	$ help pushd && help popd
 
 
-## Master your history (expansion)
+## Remember the past
 
 Every command you run in bash is recorded. 
 It is stored in `~/.bash_history` by default, and can be listed by using the `history` command.
@@ -178,7 +198,7 @@ Here is an example of what such a call could look like:
 	    4  git commit -m "added foo"
 	    5  git commit -m "added bar and baz"
 	    6  cd ..
-	  ...
+	  ...  # skipping a few thousand lines
 	 3410  pwd
 	 3411  cd foo/bar
 	 3412  history
@@ -203,7 +223,7 @@ The command `!git` would expand to your last call to `git`, while `!?foo` would 
 Since the most common case probably is to execute some variant of the previous command, there is also an alias for this, `!!`, which is simply shorthand for writing `!-1`.
 This of course means that the punchline of [this fameous XKCD](http://xkcd.com/149/) could been written as `sudo !!` :)
 
-History expansions are a lot more powerful than here is room to discuss here.
+History expansions are a lot more powerful than there is room to discuss here.
 Especially [modifiers](http://www.gnu.org/software/bash/manual/bash.html#Modifiers), which lets you modify the commands you retrieve before they are expanded, adds a lot of power.
 This is just a very quick overview.
 It would be well worth your time to study [some examples](http://www.thegeekstuff.com/2011/08/bash-history-expansion/) and learn to use them.
@@ -270,8 +290,11 @@ Instead we can ue the `&&` operator to make bash run commands in sequence if, an
 
     $ ./configure && make && make install 
 
-
 ## Use Controll Structures
+
+Bash's controll structures are frequently used in scripts, but keep in mind that you can harness their power from the command line as well.
+
+TODO
 
 ## Configure Your Shell
 
