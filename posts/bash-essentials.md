@@ -1,9 +1,3 @@
----
-date: 2013-06-30
-title: Learn the Bash command line essentials
-description: Working in the shell is pretty effective, but it can always be more so. This blogpost outlines some of the things that have made my life easier.
----
-
 # Learn the Bash command line essentials
 
 As developers, most of us use Bash more or less every day.
