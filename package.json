@@ -7,8 +7,8 @@
 		"marked": "~0.2",
 		"yaml-front-matter": "~1",
 		"underscore": "~1.4",
-		"promised-io": "~0.3",
-		"highlight.js": "~7.3"
+		"highlight.js": "~7.3",
+		"js-yaml": "~2.1"
 	},
 	"main": "generate.js",
 	"private": true

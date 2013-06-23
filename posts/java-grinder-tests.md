@@ -1,9 +1,3 @@
----
-date: 2011-12-27
-title: Writing Grinder Test Scripts in Java
-description: "Although Grinder supports writing test scripts in Python, sometimes you want or need to do things in Java."
----
-
 # Writing Grinder Test Scripts in Java
 
 I've recently been doing quite a bit of performance testing, and my most important tool for this has been [The Grinder](http://grinder.sourceforge.net/) — an open source, lightweight load testing framework.

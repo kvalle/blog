@@ -1,9 +1,3 @@
----
-date: 2011-09-05
-title: Blogging with Jekyll & Git
-description: "So, I started a blog. This is how it works."
----
-
 # Blogging with Jekyll & Git
 
 Yeah, so I finally created a blog. 

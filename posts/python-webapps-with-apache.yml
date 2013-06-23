@@ -1,7 +1,4 @@
----
 title: Serving Python Web Applications With Apache
 date: 2013-03-09
 description: Short tutorial on how to set up an Apache HTTP Server to serve Python webapps through the Web Server Gateway Interface (WSGI).
 external: http://open.bekk.no/serving-python-webapps-with-apache/
----
-

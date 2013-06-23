@@ -1,9 +1,3 @@
----
-date: 2011-10-31
-title: Working with text encoding from the command line
-description: "Everyone has a horror story about text encoding. Fortunately, in many cases all you need is the command line and two simple commands: `file` and `iconv`."
----
-
 # Working with text encoding from the command line
 
 Today I was faced with the follwing task: given a directory of files of various and unknown encodings, convert them all to UTF-8.

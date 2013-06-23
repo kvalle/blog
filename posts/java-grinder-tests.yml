@@ -1,0 +1,3 @@
+date: 2011-12-27
+title: Writing Grinder Test Scripts in Java
+description: "Although Grinder supports writing test scripts in Python, sometimes you want or need to do things in Java."

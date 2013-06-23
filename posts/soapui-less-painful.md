@@ -1,9 +1,3 @@
----
-date: 2012-03-07
-title: Making SoapUI a bit less painful
-description: "SoapUI is a horrible tool. Unfortunately it's the best one we have. Learn a few useful shortcuts which will make your life a bit less painful while working with it."
----
-
 # Making SoapUI a bit less painful
 
 At work, one of the applications I work with is talking to other systems using web services. 

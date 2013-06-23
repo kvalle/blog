@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 
+// enables use of `require(path-to-yml-file)`
+require('js-yaml'); 
+
 var fs = require('fs'),
     marked = require('marked'),
     path = require('path'),
-    yaml_front = require('yaml-front-matter'),
     _ = require('underscore'),
-    q = require('promised-io'),
     colorize = require('colorize'),
     highlight = require('highlight.js');
-
+    
 var published_path = './posts';
 var public_path = './public';
 var posts_path = public_path + '/posts';
@@ -31,105 +32,105 @@ marked.setOptions({
 });
 
 function success(filename) {
-    var message = colorize.ansify('#green[\u2713] %s')
-    console.log(message, filename)
+    console.log(colorize.ansify('#green[\u2713] %s'), filename)
 }
 
 function warning(warning) {
-    var message = colorize.ansify('#yellow[\u2717] %s')
-    console.log(message, warning)
+    console.log(colorize.ansify('#yellow[\u2717] %s'), warning)
 }
 
 function failure(filename, error) {
-    var message = colorize.ansify('#red[\u203D] %s\n  \u21D2 %s')
-    console.log(message, filename, error)
-    return false;
-}
-
-function parse(raw, filename) {
-    try {
-        var meta = yaml_front.loadFront(raw);
-    } catch (ex) {
-        return failure(filename, "Could not parse front matter.");    
-    }
-    
-    if (!meta) {
-        return failure(filename, "Could not parse front matter.");
-    }
-    if (!meta.date) {
-        return failure(filename, "No date specified.");
-    }
-    var base = path.basename(filename, '.md');
-    try {
-        meta['markdown'] = marked(meta.__content);
-    } catch (ex) {
-        return failure(filename, "Could not parse markdown.");
-    }
-    meta['date_string'] = meta.date.toDateString();
-    meta['title'] = meta.title || title_from_filename(base);
-    meta['href'] = meta.external || '/posts/'+base+'.html'
-    if (meta.description) {
-        meta['description'] = marked(meta.description);
-    }
-
-    return meta;
+    console.log(colorize.ansify('#red[\u203D] %s\n  \u21D2 %s'), filename, error)
 }
 
 function title_from_filename(base) {
     title = base.replace(/-/g, " ");
-    title = title[0].toUpperCase() + title.slice(1);
-    return title;
+    return title[0].toUpperCase() + title.slice(1);
 }
 
-function process(filename) {
-    return function(data) {
-        var meta = parse(data, filename);
-        if (!meta) {
+function removeOldHtmlFiles() {
+    _.each(fs.readdirSync(posts_path), function(file) {
+        if (path.extname(file) == ".html") {
+            fs.unlinkSync(posts_path + '/' + file);
+        }
+    });
+}
+
+function writePostAsHtml(post) {
+    var base = post.filename;
+    var html = post_template({post : post});
+    fs.writeFile(posts_path+'/'+base+'.html', html, function(err) {
+        if (err) throw err;
+        success(post.filename);
+    });
+}
+
+function listPostFilesSync() {
+    var files = fs.readdirSync(published_path);
+    files = _.filter(files, function(name) {
+        return path.extname(name) == ".yml"
+    });
+    return _.map(files, function(name) {
+        return path.basename(name, '.yml')
+    })
+}
+
+function processPostData(metadata_file) {
+    try {
+        var post = require(published_path + '/' + metadata_file + ".yml");
+    } catch (ex) {
+        failure(metadata_file, "Could not parse metadata.");    
+        return false;
+    }
+    if (!post) {
+        failure(metadata_file, "Metadata (yml) file empty.");
+        return false;
+    }
+    if (!post.date) {
+        failure(metadata_file, "No date specified.");
+        return false;
+    }
+    
+    if (!post.external) {
+        try {
+            var md_file = published_path + '/' + metadata_file + '.md';
+            var text = fs.readFileSync(md_file, 'utf-8');
+            post['markdown'] = marked(text);
+        } catch (ex) {
+            failure(md_file, "Could not parse markdown.");
             return false;
         }
-
-        var base = path.basename(filename, '.md');
-        fs.writeFile(posts_path+'/'+base+'.html', post_template({post : meta}), function(err) {
-            if (err) throw err;
-            success(filename);
-        });
-
-        delete meta.markdown
-        delete meta.__content
-        return meta;
     }
-}
 
-function error(filename) {
-    return function(err) {
-        return failure(filename, err);
+    post['filename'] = path.basename(metadata_file, '.yml');
+    post['date_string'] = post.date.toDateString();
+    post['title'] = post.title || title_from_filename(post.filename);
+    post['href'] = post.external || '/posts/'+ post.filename +'.html'
+    if (post.description) {
+        post['description'] = marked(post.description);
     }
+    return post;
 }
 
-var existing_files = fs.readdirSync(posts_path);
-for (var i=0; i<existing_files.length; i++) {
-    var html_file = posts_path + '/' + existing_files[i];
-    if (path.extname(html_file) == ".html") {
-        fs.unlinkSync(html_file);
-    }
-}
-
-var md_files = fs.readdirSync(published_path);
-var posts = []
-
-for (var i=0; i<md_files.length; i++) {
-    var filename = md_files[i];
-    var promise = q.execute(fs.readFile, published_path+'/'+filename, 'utf-8');
-    posts[i] = q.whenPromise(promise, process(filename), error(filename));
-}
-
-q.all(posts).then(function(posts) {
-    posts = posts.filter(function (p) {return p});
-    posts = posts.sort(function(p1, p2) {return (p2.date - p1.date)});
-    var html = index_template({blogposts : posts})
+function createIndexPage(posts)  {
+    var sortedPosts = posts.sort(function(p1, p2) {return (p2.date - p1.date)});
+    var html = index_template({blogposts : sortedPosts})
     var path = public_path+'/index.html'
     fs.writeFile(path, html, function(err) {
         if (err) throw err;
-        success("index.html");
+        success("index page");
     });
-})
+}
+
+(function main() {
+    removeOldHtmlFiles()
+
+    var posts = _.map(listPostFilesSync(), function(filename) {
+        return processPostData(filename);
+    });
+    posts = _.filter(posts, function (post) {return post} );
+
+    _.each(posts, writePostAsHtml);
+
+    createIndexPage(posts);
+})();
