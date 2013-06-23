@@ -124,13 +124,10 @@ function createIndexPage(posts)  {
 
 (function main() {
     removeOldHtmlFiles()
-
     var posts = _.map(listPostFilesSync(), function(filename) {
         return processPostData(filename);
     });
-    posts = _.filter(posts, function (post) {return post} );
-
+    posts = _.filter(posts, _.identity);
     _.each(posts, writePostAsHtml);
-
     createIndexPage(posts);
 })();
