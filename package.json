@@ -5,7 +5,6 @@
 	"dependencies" : { 
 		"colorize": "~0.1",
 		"marked": "~0.2",
-		"yaml-front-matter": "~1",
 		"underscore": "~1.4",
 		"highlight.js": "~7.3",
 		"js-yaml": "~2.1"
