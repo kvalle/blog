@@ -1,12 +1,12 @@
 ---
-date: 2013-04-04
+date: 2013-06-30
 title: Learn the Bash command line essentials
 description: Working in the shell is pretty effective, but it can always be more so. This blogpost outlines some of the things that have made my life easier.
 ---
 
 # Learn the Bash command line essentials
 
-Most of us use Bash more or less every day.
+As developers, most of us use Bash more or less every day.
 Even if you develop on Windows you are probably using Cygwin, and chances are you deploy your code to a Unix server anyway.
 
 Bash might, arguably, not be the best shell out there, but it has one great strength — it is installed as default almost everywhere!
@@ -18,7 +18,7 @@ We won't use any complicated commands, just look at the standad basic features a
 
 ## Understand I/O redirection
 
-If there is one single thing that, once you understand it, everything else will sort of magically fall into place, then that ting is how redirection of inputs and outputs in Bash works.
+If there is one single thing that, once you understand it, everything else will sort of magically fall into place, then that would be how redirection of inputs and outputs in Bash works.
 
 Working with I/O in bash is working with files.
 There are three files which you'll always have open by default: `stdin` (input from the keyboard), `stdout` (output to the screen) and `stderr` (error messages output to the screen).
