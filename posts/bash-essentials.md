@@ -79,6 +79,7 @@ And once you get the cursor where you need to go, you can use the following comm
 - `Esc` + `.` to "paste" in the last argument to the last command you entered.
 - `Ctrl` + `t` to swap the last two characters before the cursor.
 - `Esc` + `t` to swap the last two words before the cursor.
+- `Ctrl` + `_` to undo the last change.
 
 Other:
 
@@ -89,9 +90,6 @@ Other:
 - `Ctrl` + `z` to send the current process to the background.
 - `Ctrl` + `d` to exit the shell. Same as the `exit` command.
 
-And perhaps the most important of them all:
-
-- `Ctrl` + `_` to undo.
 
 And in case you really want do dig into how this works — the Bash hotkey support is based on the `readline` command, which has an extensive man page:
 
@@ -160,7 +158,7 @@ Lets go back and have a look:
 	$ pwd
 	/home/kjetil/logs
 
-## Be many places at once
+### Be many places at once
 
 *TODO*
 
@@ -284,18 +282,31 @@ Instead we can ue the `&&` operator to make bash run commands in sequence if, an
 
     $ ./configure && make && make install 
 
-## Use Controll Structures
+### Use Controll Structures
 
-Bash's controll structures are frequently used in scripts, but keep in mind that you can harness their power from the command line as well.
+Bash's controll structures are frequently used in scripts, but keep in mind that you can harness their power from the command line too — just use `;` where you would normally have a line break.
 
-TODO
+For loops are handy when working with files.
+Say, for example, you need to roll some log files:
+
+	$ for i in {10..1}; do mv $i.log $(($i+1)).log; done
+
+It's of course also possible to work with files more directly, using [globbing][wikipedia-glob] or by iterating over the output from some command.
+
+	$ for f in ls ~/important/config; do cp $f ~/backup; echo "backed up $f"; done
+
+While loops can be useful when you need to do something repeatedly for a while.
+
+	$ while :; do ./run_tests.sh; sleep 10; done
+
+[wikipedia-glob]: http://en.wikipedia.org/wiki/Glob_(programming)
 
 ## Configure Your Shell
 
 Everything we have discussed up to now is vanilla out-of-the-box bash, and thus available anywhere you go.
 But inn all likelihood you'll find yourself doing the bulk of your work at your own local shell, and as such it can be a good idea to make it as comfortable as possible.
 
-To configure bash, you edit the `.bashrc` file in your home folder.
+To configure bash, edit the `.bashrc` file in your home folder.
 
 	$ vim ~/.bashrc
 
