@@ -3,11 +3,13 @@
 Programmeringspråk. For en verden full av merkelige og fantastiske idéer og konsepter.
 I dag har jeg lyst til å skrive litt om noen konsepter jeg lærte om da jeg var på [Lambda Jam](http://lambdajam.com/)-konferansen i Chicago i sommer. Det skal handle om *continuations*, programmeringspråkenes svar på save games, og litt om hvordan en ved hjelp av disse kan transformere programmer på måter som bevarer korrekthet men kan endre kjøreegenskaperne.
 
+Dette blir teoretisk, med enkle eksempler, og forhåpentlig ganske gøy.
+
 ## Vi starter enkelt
 
 Vi starter med et meget velkjent eksempel for alle som noen sinne har lest om (funksjonelle) programmeringspråk på internett: Factorial!
 
-```
+```scheme
 > (define factorial
       (lambda (n)
           (if (= n 0) 
@@ -83,11 +85,99 @@ Men i tillegg til å returnere den inkrementerte verdien gjør `next` én ting t
 (call/cc (lambda (k) (set! the-continuation k)))
 ```
 
-Først har vi et kall til funksjonen `call/cc` (som står for *call with current continuation*). `call/cc` tar en funksjon som argument, og kaller denne funksjonen med en continuation som representerer nåværende tilstand i programmet. Siden vi her mater `call/cc` et lambda-uttrykk settes altså `k` til nåværende continuation, og vi lagrer denne i variabelen `the-continuation` som er definert utenfor funksjonen.
+Først har vi et kall til funksjonen `call/cc` (som er kort for `call-with-current-continuation`). `call/cc` tar en funksjon som argument, og kaller denne funksjonen med en continuation som representerer nåværende tilstand i programmet. Siden vi her mater `call/cc` et lambda-uttrykk settes altså `k` til nåværende continuation, og vi lagrer denne i variabelen `the-continuation` som er definert utenfor funksjonen.
 
 Funksjonen `next` sørger dermed for å lagre tilstanden i koden på punktet rett før `n` inkrementeres. Funksjonen `next` utfører altså to oppgaver: a) å inkrementere og returnere input, og b) å lagre en continuation i den ytre variablen `the-continuation`. 
 
-## Okay, men hvordan virker det egentlig? 
+Continuations representerer "arbeidet som gjenstår" på et gitt punkt i koden. For å fortsette dette arbeidet kan vi kalle dem som om de var helt vanlige funksjoner. Hva skjer så når vi kaller `the-continuation`?
+
+```scheme
+> (next 0)
+1
+> (the-continuation)
+2
+> (the-continuation)
+3
+```
+
+Vi fortsetter å inkrementere og returnere den samme variabelen! Siden vi på punktet `the-continuation` ble lagret ikke enda hadde returnert fra funksjonen fortsetter vi å oppdatere den `n` i `next` sin closure. Vi hopper midt inn i `next`, opererer på den samme variabelen hver gang, før vi returnerer på nytt (og på nytt og på nytt)!
+
+Her er litt mer eksempel på bruk, slik at det skal bli enklere å forstå hvordan alt henger sammen.
+
+```scheme
+> (next 0)
+1
+> (the-continuation)
+2
+> ; lagrer en kopi av the-continuation
+  (define another-continuation the-continuation)
+> (the-continuation)
+3
+> (another-continuation)
+4
+> (the-continuation)
+5
+> (next 0)
+1
+> (the-continuation)
+2
+> (another-continuation)
+6
+```
+
+Legg merke til at både `the-continuation` og kopien vi lagrer i `another-continuation` opererer på samme continuation, og dermed inkrementerer samme `n`. Når vi kaller `next` "resetter" vi `the-continuation` med en ny continuation, mens `another-continuation` fremdeles jobber på samme som før.
+
+Som en ekstra observasjon legger vi også merke til at `the-continuation` i eksempelet over ser ut som en funksjon, men oppfører seg mer som en iterator; Vi har implementert en enkel [generator][wikipedia-generator].
+
+[wikipedia-generator]: http://en.wikipedia.org/wiki/Generator_(computer_programming)
+
+## Har du et litt mer avansert eksmpel?
+
+Klart det. La oss se på denne noe mer avanserte (og like lite nyttige) generatoren, implementert på samme måte.
+
+```scheme
+(define next-fib #f)
+
+(define (init-fib)
+  (let* ((x 1) 
+        (y 1) 
+        (tmp #f))
+    (call/cc (lambda (k) (set! next-fib k)))
+    (set! tmp x)
+    (set! x y)
+    (set! y (+ x tmp))
+    x))
+```
+
+Denne fibonacci-implementasjonen fungerer på følgende måte.
+
+```scheme
+> (init-fib)
+1
+> (next-fib)
+2
+> (next-fib)
+3
+> (next-fib)
+5
+> (next-fib)
+8
+> (next-fib)
+13
+```
+
+Dette eksempelet viser også hvor viktig det er å holde tunga rett i munnen når en bruker continuations. For å få hentet ut de 5 første fibonacci-tallene kan det kanskje friste å skrive noe à la det følgende:
+
+```
+> (init-fib)
+1
+> (map next-fib (list 1 2 3 4 5))
+2
+```
+
+Men vi ser at vi slett ikke får returnert en liste, slik en skulle tro, men bare ett enkelt fibonacci-tall tilbake. Grunnen til dette er at å kalle `next-fib` ikke er som å kalle en vanlig funksjon, men å flytte utførelsen av programmet til continuation som `next-fib` representerer, og på dette punktet hadde det ikke skjedd noe kall til `map`!
+
+## Okay, men hvordan virker dette egentlig? 
 
 > TODO
 
