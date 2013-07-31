@@ -1,7 +1,7 @@
 # Continuations og CPS
 
 Programmeringspråk—for en verden full av merkelige og fantastiske idéer og konsepter.
-I dag har jeg lyst til å skrive litt om noe jeg lærte om da jeg var på [Lambda Jam](http://lambdajam.com/)-konferansen i Chicago i sommer. Det skal handle om *continuations passing style*, CPS, en måte å skrive om programmer slik at de blir fryktelig vanskelige å lese, men får noen morsomme egenskaper. Dette blir teoretisk, for de fleste fullstendig unyttig for de aller fleste, og forhåpentlig ganske artig (for spesielt interesserte).
+I dag har jeg lyst til å skrive litt om noe jeg lærte om da jeg var på [Lambda Jam](http://lambdajam.com/)-konferansen i Chicago i sommer. Det skal handle om *continuations passing style*, CPS, en måte å skrive om programmer slik at de blir fryktelig vanskelige å lese, men får noen morsomme egenskaper. Dette blir teoretisk, for de fleste fullstendig unyttig for de aller fleste, og forhåpentlig ganske artig (i alle fall for noen spesielt interesserte).
 
 ## Vi starter enkelt
 
@@ -299,13 +299,15 @@ TODO: Fibonacci-eksempelet
 
 ## Oppsummering
 
-TODO: CPS for å tvinge kode til å bli tail-rekursiv.
+Vi har sett at Continuation Passing Style er en måte å programmere på som gir den resulterende koden noen helt spesifikke, og ofte ettertraktede, egenskaper. Koden får en helt eksplisitt evalueringsrekkefølge, ettersom vi ikke returnerer til noen implisitte continuations er alle kall tail-calls, og alle argumenter er enkle uttrykk.
 
-Det skal også bemerkes at disse teknikkene ikke vil hjelpe oss i språk som ikke er optimalisert for tail-kall. I slike språk kan en bruke en teknikk som kalles [trampolining][wiki-trampolining] sammen med CPS for å oppnå tilsvarende resultater.
+I noen eksempler så vi hvordan det å bruke CPS som en generell taktikk for tvinge tail-calls førte til at programmer eksekverte med konstant størrelse på kall-stacken. Det skal også bemerkes at CPS alene ikke vil hjelpe oss med dette i språk som ikke er optimalisert for tail-kall. I slike språk kan en bruke teknikker som [trampolining][wiki-trampolining] sammen med CPS for å oppnå tilsvarende resultater.
 
 [wiki-trampolining]: https://en.wikipedia.org/wiki/Trampoline_(computers)#High_level_programming
+
+Prosessen med å konvertere programmer krever også en hel del konsentrasjon, og det er lett å gjøre feil. Koden "vrenges" inn-ut, og kan lett bli tung å lese. Dette er ikke en teknikk som brukes manuelt av mange programmerere, men i langt større grad av kompilatorer og liknende. Det er likevel morsomt å vite at en har muligheten dersom behovet skulle oppstå, og det er en viktig transformasjon å kjenne hvis en har lyst til å lære om kompilering av høynivå språk.
 
 **Fotnoter**
 
 1. <a id="footnote-1"></a>Eksemplene i denne bloggposten er kun testet i [Petite Scheme](http://www.scheme.com/petitechezscheme.html), men bruker ikke noen spesielle features, og burde fungere i de fleste scheme-interpreters. Kanskje med unntak av `trace`.
-2. <a id="footnote-2"></a>Merk at selv om (lambda-)funksjoner med ett argument i disse eksemplene er brukt for å representere continuations, betyr ikke dette at lambdaer er den eneste mulige representasjonen. Continuation som konsept er ikke bundet til én enkelt representasjon.
+2. <a id="footnote-2"></a>Merk at selv om (lambda-)funksjoner med ett argument er brukt for å representere continuations i disse eksemplene, så betyr ikke dette at lambdaer er den eneste mulige representasjonen. Continuation som konsept er ikke knyttet til noen enkelt representasjon.
