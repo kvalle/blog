@@ -1,7 +1,11 @@
 # Continuations og CPS
 
 Programmeringspråk—for en verden full av merkelige og fantastiske idéer og konsepter.
-I dag har jeg lyst til å skrive litt om noe jeg lærte om da jeg var på [Lambda Jam](http://lambdajam.com/)-konferansen i Chicago i sommer. Det skal handle om *continuation passing style*, CPS, en måte å skrive om programmer slik at de blir fryktelig vanskelige å lese, men får noen morsomme egenskaper. Dette blir teoretisk, for de fleste fullstendig unyttig for de aller fleste, og forhåpentlig ganske artig (i alle fall for noen spesielt interesserte).
+I dag har jeg lyst til å skrive litt om noe jeg lærte om da jeg var på [Lambda Jam](http://lambdajam.com/)-konferansen i Chicago i sommer. 
+Der var jeg blant annet på en [workshop om program transformations](http://lambdajam.com/sessions#amin) med William Byrd og Nada Amin.
+Denne bloggposten omhandler noe av det aller mest grunnleggende vi gikk igjennom der.
+Det skal handle om *continuation passing style* (CPS) en måte å skrive om programmer slik at de blir fryktelig vanskelige å lese, men får noen morsomme egenskaper. 
+Dette blir teoretisk, for de aller fleste fullstendig unyttig, og forhåpentlig ganske artig (i alle fall for noen spesielt interesserte).
 
 ## Vi starter enkelt
 
