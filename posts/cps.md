@@ -12,10 +12,11 @@ Dette blir teoretisk, for de aller fleste fullstendig unyttig, og forhåpentlig 
 Vi starter med et meget velkjent eksempel<sup>[1](#footnote-1)</sup> for alle som noensinne har lest om (funksjonelle) programmeringspråk på internett: Factorial!
 
 ```scheme
-> (define (factorial n)
-    (if (= n 0) 
-        1
-        (* n (factorial (- n 1)))))
+> (define factorial 
+    (lambda (n)
+      (if (= n 0) 
+          1
+          (* n (factorial (- n 1)))))
 > (factorial 5)
 120
 ```
@@ -45,12 +46,14 @@ Kall-stacken vokser for hvert rekursive kall. Dette fungerer greit for små inpu
 Ofte kan vi løse det ved å lage en ekvivalent implementasjon som er tail-rekursiv, gjerne ved hjelp av en hjelpe-funksjon. I tail-kall-optimaliserte språk vil dette løse problemet. Et eksempel på en slik implementasjon vises under.
 
 ```scheme
-> (define (factorial-iter n acc)
-    (if (= n 0)
-        acc
-        (factorial-iter (- n 1) (* n acc))))
-> (define (factorial n)
-    (factorial-iter n 1))
+> (define factorial-iter
+    (lambda (n acc)
+      (if (= n 0)
+          acc
+          (factorial-iter (- n 1) (* n acc)))))
+> (define factorial 
+    (lambda (n)
+      (factorial-iter n 1)))
 > (factorial 5)
 120
 ```
@@ -79,7 +82,7 @@ Denne omskrivingen fungerer bra. Dessverre kan det i mange tilfeller være svær
 
 ## Continuations
 
-For å forstå continuations er det lurt å begynne enkelt. La oss starte med den kanskje enkleste funksjonen du vil se i dag: funksjonen som plusser én til sitt input.
+For å forstå continuations er det lurt å begynne enkelt. La oss starte med den kanskje enkleste funksjonen du vil se i dag: funksjonen som legger én til sitt input.
 
 ```scheme
 (define (inc n)
@@ -110,7 +113,8 @@ Vi ønsker å lage en continuation som representerer arbeidet som gjenstår ette
   (+ 1 (- 2 HULL)))
 ```
 
-Denne funksjonen representerer nå evalueringen som vil gjøres etter at 3 og 4 er lagt sammen.
+Denne funksjonen representerer nå evalueringen som vil gjøres etter at 3 og 4 er lagt sammen. 
+
 
 ## Continuation Passing Style
 
@@ -126,8 +130,9 @@ Programmering i CPS følger disse reglene:
 La oss ta for oss et enkelt eksempel. Vi begynner med følgende funksjon, `add-double`, som simpelthen returnerer det dobbelte av summen av sine to argumenter.
 
 ```scheme
-> (define (add-double x y)
-    (* 2 (+ x y)))
+> (define add-double
+    (lambda (x y)
+      (* 2 (+ x y))))
 > (add-double 2 3)
 10
 ```
@@ -135,59 +140,54 @@ La oss ta for oss et enkelt eksempel. Vi begynner med følgende funksjon, `add-d
 Denne funksjonen kan skrives om som følger, for å følge continuation passing style.
 
 ```scheme
-(define (add-double& x y k)
-  (+& x y (lambda (xy)
-      (*& 2 xy k))))
+(define add-double& 
+  (lambda (x y k)
+    (+& x y (lambda (xy)
+        (*& 2 xy k)))))
 ```
 
-Legg merke til at vi først legger sammen `x` and `y`, som er det innerste uttrykket i den normale `add-double`-funksjonen. Resultatet av dette sendes til en `lambda`-continuation, som i sin tur multipliserer veriden med 2, før den "returnerer" ved å sende det endelige resultatet til `k`, continuation som ble sendt inn til `add-double&`.
+Legg merke til at vi først legger sammen `x` and `y`, som er det innerste uttrykket i den normale `add-double`-funksjonen. Resultatet av dette sendes til en `lambda`-continuation, som i sin tur multipliserer verdien med 2, før den "returnerer" ved å sende det endelige resultatet til `k`.
 
 Vi ser også at vi ikke har kunnet bruke de vanlige versjonene av `+` and `*`, ettersom disse ikke er i CPS. I stedet har vi definert nye varianter som følger:
 
 ```scheme
-(define (*& x y k)
-  (k (* x y)))
+(define *& 
+  (lambda (x y k)
+    (k (* x y))))
 
-(define (+& x y k)
-  (k (+ x y)))
+(define +& 
+  (lambda x y k)
+    (k (+ x y)))
 ```
 
-For å testen `add-double` sender vi en passende lambda-funksjon inn som continuation, slik at vi får fatt på resultatet. Her kommer identitetfunksjonen greit med.
+For å testen `add-double` sender vi en passende lambda-funksjon inn som continuation, slik at vi får fatt på resultatet. Her kommer identitetfunksjonen greit med. La oss definere denne som `empty-k`, slik at vi kan bruke den videre.
 
 ```scheme
-> (add-double& 2 3 (lambda (x) x))
+> (define empty-k
+    (lambda (x) x))
+> (add-double& 2 3 empty-k)
 10
 ```
 
 **Fremgangsmåte**
 
-La oss ta et annet eksempel, og se på stegene en må følge for å konvertere et program i "direct style" over til CPS.
+La oss gå igjennom et annet eksempel, og se på stegene en må følge for å konvertere et program i "direct style" over til CPS.
 
 Eksempelet vi tar for oss er Pythagoras formel for å regne ut hypothenus. Her er først vanlig kode, som ikke er CPS. Vi har 2 funksjoner: `square` for å regne ut `x * x`, og `hypo` som regner ut hypothenus gitt lengde av to katet.
 
 
 ```scheme
-(define (square x) (* x x))
-
-(define (hypo a b)
-  (sqrt (+ (square a)
-     (square b))))
-```
-
-I Scheme er denne formen for `define` syntaktisk sukker for følgende definisjon med lambda-uttrykk. Vi skriver om til dette, så det er tydeligere hva vi har å jobbe med.
-
-```scheme
-(define square
-  (lambda (x)
+(define square 
+  (lambda (x) 
     (* x x)))
 
-(define hypo
+(define hypo 
   (lambda (a b)
     (sqrt (+ (square a)
        (square b)))))
 ```
 
-La oss starte med å konvertere `square` til CPS og kalle denne `square/k`. For å gjøre dette benytter vi en regel.
+La oss starte med å konvertere `square` til CPS og kalle denne `square/k`. For å gjøre dette benytter vi først følgende regel.
 
 > Alle lambda-uttrykk skal utvides med et ekstra argument, før en fortsetter å prosessere funksjonskroppen til lambdaen.
 > 
@@ -201,7 +201,7 @@ Vi vet altså at løsningen må være noe á la følgende:
     NOE))
 ```
 
-Vi vet også alt at resultatet av funksjonen sendes videre til `k`, så løsningen må bli:
+Fra før vet vi at resultatet av funksjonen sendes inn til `k`, så løsningen må bli:
 
 ```scheme
 (define square/k
@@ -209,9 +209,7 @@ Vi vet også alt at resultatet av funksjonen sendes videre til `k`, så løsning
     (k (* x x))))
 ```
 
-Dette gikk foreløpig ganske greit! Vi gyver løs på `hypo/k`.
-
-Igjen vet vi, basert på regelen over, at løsningen må ha form som følger.
+Dette gikk greit! Vi gyver løs på `hypo/k`. Igjen vet vi, basert på regelen over, at løsningen må ha form som følger.
 
 ```scheme
 (define hypo/k
@@ -220,6 +218,10 @@ Igjen vet vi, basert på regelen over, at løsningen må ha form som følger.
 ```
 
 Det neste vi må gjøre er å finne det første uttrykket som kan evalueres. I dette tilfellet kan det være enten `(square a)` eller `(square b)`, ettersom evaluerings-rekkefølgen til argumenter ikke er spesifisert i Scheme. Det er opp til oss å velge, og dermed avgjøre eksekveringsrekkefølgen. La oss bestemme at `(square a)` evalueres først.
+
+Regelen for å behandle kroppen til lambda-uttrykk blir noe slikt som:
+
+> Identifiser første uttrykk som kan evalueres.
 
 Vi husker å benytte den CPS-ifiserte `square/k`, og må derfor sende inn en continuation som siste argument, der vi skal implementere resten av koden. Variabelen vi sender inn `a2` representerer resultatet av føste del, kvadratet av `a`.
 
@@ -371,9 +373,33 @@ Og for de som måtte lure på hvordan koden ville sett ut dersom vi ikke hadde v
 
 ## Et siste eksempel
 
-TODO: Fibonacci-eksempelet
+La oss avslutte med et siste eksempel, et der det gjøres 2 rekursive kall, og som dermed ikke er like enkelt å løse med en akkumulator slik vi kunne for factorial.
 
-<https://cgi.soic.indiana.edu/~c311/doku.php?id=cps-refresher>
+```scheme
+(define fib
+  (lambda (n)
+    (cond
+      [(zero? n) 1]
+      [(= n 1) 1]
+      [else (+ (fib (- n 1)) 
+               (fib (- n 2)))])))
+```
+
+Funksjonen som regner ut det n-te fibonacci-tallet er vel kjent for de fleste.
+Etter omskriving til CPS blir resultetet følgende:
+
+```scheme
+(define fib/k
+  (lambda (n k)
+    (cond
+     [(zero? n) (k 1)]
+     [(= n 1) (k 1)]
+     [else (+ (fib/k (- n 1) (lambda (fib-n-minus-1)
+                                (fib/k (- n 2) (lambda (fib-n-minus-2)
+                                                  (k (+ fib-n-minus-1 fib-n-minus-2)))))))])))
+```
+
+Klarer du å følge stegene vi brukte over, og komme frem til det samme?
 
 ## Oppsummering
 
