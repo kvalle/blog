@@ -394,9 +394,9 @@ Etter omskriving til CPS blir resultetet følgende:
     (cond
      [(zero? n) (k 1)]
      [(= n 1) (k 1)]
-     [else (+ (fib/k (- n 1) (lambda (fib-n-minus-1)
-                                (fib/k (- n 2) (lambda (fib-n-minus-2)
-                                                  (k (+ fib-n-minus-1 fib-n-minus-2)))))))])))
+     [else (fib/k (- n 1) (lambda (fib-n-minus-1)
+                             (fib/k (- n 2) (lambda (fib-n-minus-2)
+                                               (k (+ fib-n-minus-1 fib-n-minus-2))))))])))
 ```
 
 Klarer du å følge stegene vi brukte over, og komme frem til det samme?
