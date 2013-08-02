@@ -1,6 +1,6 @@
 # Continuations og CPS
 
-Programmeringspråk—for en verden full av merkelige og fantastiske idéer og konsepter.
+Programmering—for en verden full av merkelige og fantastiske idéer og konsepter.
 I dag har jeg lyst til å skrive litt om noe jeg lærte om da jeg var på [Lambda Jam](http://lambdajam.com/)-konferansen i Chicago i sommer. Det skal handle om *continuations passing style*, CPS, en måte å skrive om programmer slik at de blir fryktelig vanskelige å lese, men får noen morsomme egenskaper. Dette blir teoretisk, for de fleste fullstendig unyttig for de aller fleste, og forhåpentlig ganske artig (i alle fall for noen spesielt interesserte).
 
 ## Vi starter enkelt
@@ -8,16 +8,15 @@ I dag har jeg lyst til å skrive litt om noe jeg lærte om da jeg var på [Lambd
 Vi starter med et meget velkjent eksempel<sup>[1](#footnote-1)</sup> for alle som noensinne har lest om (funksjonelle) programmeringspråk på internett: Factorial!
 
 ```scheme
-> (define factorial
-      (lambda (n)
-          (if (= n 0) 
-              1
-              (* n (factorial (- n 1))))))
+> (define (factorial n)
+    (if (= n 0) 
+        1
+        (* n (factorial (- n 1)))))
 > (factorial 5)
 120
 ```
 
-Dette er den naïve implementasjonen av factorial. La oss ta en titt:
+Dette er den naive implementasjonen av factorial. La oss ta en titt:
 
 ```scheme
 > (trace factorial)
@@ -42,14 +41,12 @@ Kall-stacken vokser for hvert rekursive kall. Dette fungerer greit for små inpu
 Ofte kan vi løse det ved å lage en ekvivalent implementasjon som er tail-rekursiv, gjerne ved hjelp av en hjelpe-funksjon. I tail-kall-optimaliserte språk vil dette løse problemet. Et eksempel på en slik implementasjon vises under.
 
 ```scheme
-> (define factorial-iter
-      (lambda (n acc)
-        (if (= n 0)
-            acc
-            (factorial-iter (- n 1) (* n acc)))))
-> (define factorial
-      (lambda (n)
-        (factorial-iter n 1)))
+> (define (factorial-iter n acc)
+    (if (= n 0)
+        acc
+        (factorial-iter (- n 1) (* n acc))))
+> (define (factorial n)
+    (factorial-iter n 1))
 > (factorial 5)
 120
 ```
@@ -71,9 +68,9 @@ Igjen, la oss se på hvordan kall-stacken vokser:
 120
 ```
 
-Som vi ser, det eneste som øker størrelsen på stacken er kallet til `factorial-iter`! Denne omskrivingen fungerer forsåvidt bra. Dessverre kan det i mange tilfeller være svært vanskelig å komme opp med en ekvivalent tail-rekursiv algoritme for problemet en løser. 
+Som vi ser, kall-stacken øker aldri! Selv ikke kallet til `factorial-iter`, som også er et tail-kall, har noen effekt. 
 
-Men fortvil ikke, det finnes en generell løsning for hvordan en kan oppnå dette. La oss først ta et par steg tilbake for å forstå et konsept vi vil få bruk for — *continuations*.
+Denne omskrivingen fungerer bra. Dessverre kan det i mange tilfeller være svært vanskelig å komme opp med en ekvivalent tail-rekursiv algoritme for problemet en løser. Men fortvil ikke, det finnes en generell løsning for hvordan en kan oppnå dette. La oss først ta et par steg tilbake for å forstå et konsept vi vil få bruk for — *continuations*.
 
 
 ## Continuations
@@ -289,7 +286,84 @@ Det interessante med kode skrevet i CPS er at, ettersom det aldri er noen implis
 
 ## Vi vender tilbake til `factorial`
 
-TODO: factorial som cps
+La oss ta en ny titt på det innldende eksempelet, og se hva vi kan få til med CPS. Vi starter med den opprinnelige funksjonen, definert med eksplisitt lambda, og legger til det ekstra argumentet `k`.
+
+```scheme
+(define factorial
+  (lambda (n k)
+    (if (= n 0) 
+        1
+        (* n (factorial (- n 1))))))
+```
+
+Vi tar denne gangen en litt mer pragmatisk tilnærming. Så langt har vi benyttet CPS-reglene på *alle* uttrykk i programmene. Dette er strengt tatt ikke nødvendig for *enkle uttrykk*, dvs uttrykk vi vet vil returnere umiddelbart.
+
+Tidligere ville vi startet med å lage en continuation over `(= n 0)`, men siden vi vet at dette er et enkelt uttrykk lar vi det stå som det gjør.
+
+Det er derimot slik at enkle uttrykk vi ikke vet hvorvidt vil bli evaluert — uttrykk vi risikerer å "returnere" — skal pakkes inn i et kall til `k` som tidligere. Vi gjør dette, og er ferdig med "then"-grenen av `if`-uttrykket:
+
+```scheme
+(define factorial
+  (lambda (n k)
+    (if (= n 0) 
+        (k 1)
+        (* n (factorial (- n 1))))))
+```
+
+Det neste uttrykket som kan utføres er `(- n 1)`. Også dette er et enkelt uttrykk, og vi lar det være som det er. Det rekursive kallet til `factorial` er derimot definitivt ikke et enkelt uttrykk. Vi bytter "else"-grenen ut med en continuation over dette kallet.
+
+```scheme
+(define factorial/k
+  (lambda (n k)
+    (if (= n 0)
+        (k 1)
+        (factorial/k (- n 1) (lambda (fac-n-minus-1)
+                   (* n fac-n-minus-1))))))
+```
+
+Til sist må vi huske å kalle `k` i stedet for å returnere direkte:
+
+```scheme
+(define factorial/k
+  (lambda (n k)
+    (if (= n 0)
+        (k 1)
+        (factorial/k (- n 1) (lambda (fac-n-minus-1)
+                   (k (* n fac-n-minus-1)))))))
+```
+
+Voilà, vi har CPSet factorial. For å sjekke at det fungerer tracer vi et kall, og ser på stacken.
+
+```
+> (trace factorial/k)
+(factorial/k)
+> (factorial/k 5 (lambda (x) x))
+|(factorial/k 5 #<procedure>)
+|(factorial/k 4 #<procedure>)
+|(factorial/k 3 #<procedure>)
+|(factorial/k 2 #<procedure>)
+|(factorial/k 1 #<procedure>)
+|(factorial/k 0 #<procedure>)
+|120
+120
+```
+
+Sannelig, vi har fått koden til å bruke tail-kall uten å endre på måten algoritmen fungerer!
+
+Og for de som måtte lure, slik ville koden sett ut dersom vi ikke hadde vært pragmatiske og latt de enkle uttrykkene være i fred:
+
+```scheme
+(define factorial/k
+  (lambda (n k)
+    ((lambda (is-zero)
+        (if is-zero 
+            (k 1)
+            ((lambda (n-minus-1) 
+                (factorial/k n-minus-1 (lambda (fact-n-minus-1)
+                                          (k (* n fact-n-minus-1))))) (- n 1)))) (= n 0))))
+> (factorial/k 5 (lambda (x) x))
+120
+```
 
 ## Et siste eksempel
 
@@ -306,6 +380,7 @@ I noen eksempler så vi hvordan det å bruke CPS som en generell taktikk for tvi
 [wiki-trampolining]: https://en.wikipedia.org/wiki/Trampoline_(computers)#High_level_programming
 
 Prosessen med å konvertere programmer krever også en hel del konsentrasjon, og det er lett å gjøre feil. Koden "vrenges" inn-ut, og kan lett bli tung å lese. Dette er ikke en teknikk som brukes manuelt av mange programmerere, men i langt større grad av kompilatorer og liknende. Det er likevel morsomt å vite at en har muligheten dersom behovet skulle oppstå, og det er en viktig transformasjon å kjenne hvis en har lyst til å lære om kompilering av høynivå språk.
+
 
 **Fotnoter**
 
