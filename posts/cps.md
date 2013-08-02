@@ -322,7 +322,7 @@ Det neste uttrykket som kan utføres er `(- n 1)`. Også dette er et enkelt uttr
     (if (= n 0)
         (k 1)
         (factorial/k (- n 1) (lambda (fac-n-minus-1)
-                   (* n fac-n-minus-1))))))
+                                (* n fac-n-minus-1))))))
 ```
 
 Til sist må vi huske å kalle `k` i stedet for å returnere direkte:
@@ -333,12 +333,12 @@ Til sist må vi huske å kalle `k` i stedet for å returnere direkte:
     (if (= n 0)
         (k 1)
         (factorial/k (- n 1) (lambda (fac-n-minus-1)
-                   (k (* n fac-n-minus-1)))))))
+                                (k (* n fac-n-minus-1)))))))
 ```
 
-Voilà, vi har CPSet factorial. For å sjekke at det fungerer tracer vi et kall, og ser på stacken.
+Voilà, vi har CPSet factorial! For å sjekke at det fungerer tracer vi et kall, og ser på stacken.
 
-```
+```scheme
 > (trace factorial/k)
 (factorial/k)
 > (factorial/k 5 (lambda (x) x))
@@ -352,19 +352,19 @@ Voilà, vi har CPSet factorial. For å sjekke at det fungerer tracer vi et kall,
 120
 ```
 
-Sannelig, vi har fått koden til å bruke tail-kall uten å endre på måten algoritmen fungerer!
+Sannelig, stacken oppfører seg som den alternative tail-rekursive algoritmen vi så på tidligere. Men denne gangen har vi ved hjelp av CPS fått denne oppførselen uten å endre på hvordan algoritmen fungerer.
 
-Og for de som måtte lure, slik ville koden sett ut dersom vi ikke hadde vært pragmatiske og latt de enkle uttrykkene være i fred:
+Og for de som måtte lure på hvordan koden ville sett ut dersom vi ikke hadde vært pragmatiske og latt de enkle uttrykkene være i fred, her er en fullstendig CPSet versjon, der `*&`, `-&` og `=&` er CPS-varianter av de samme operatorene.
 
 ```scheme
-(define factorial/k
-  (lambda (n k)
-    ((lambda (is-zero)
-        (if is-zero 
-            (k 1)
-            ((lambda (n-minus-1) 
-                (factorial/k n-minus-1 (lambda (fact-n-minus-1)
-                                          (k (* n fact-n-minus-1))))) (- n 1)))) (= n 0))))
+> (define factorial/k
+    (lambda (n k)
+      (=& n 0 (lambda (is-zero)
+                (if is-zero 
+                    (k 1)
+                    (-& n 1 (lambda (n-minus-1) 
+                              (factorial/k n-minus-1 (lambda (fact-n-minus-1)
+                                                        (*& n fact-n-minus-1 k))))))))))
 > (factorial/k 5 (lambda (x) x))
 120
 ```

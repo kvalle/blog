@@ -78,3 +78,8 @@ Men vi ser at vi slett ikke får returnert en liste, slik en skulle tro, men bar
 
 
 
+### Sandwich
+
+> Say you're in the kitchen in front of the refrigerator, thinking about a sandwich. You take a continuation right there and stick it in your pocket. Then you get some turkey and bread out of the refrigerator and make yourself a sandwich, which is now sitting on the counter. You invoke the continuation in your pocket, and you find yourself standing in front of the refrigerator again, thinking about a sandwich. But fortunately, there's a sandwich on the counter, and all the materials used to make it are gone. So you eat it. 
+> 
+> — Luke Palmer
