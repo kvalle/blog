@@ -275,20 +275,16 @@ Da er vi i mål! Og testing av funksjonene viser at alt fortsatt fungerer som f�
 
 ## Egenskaper
 
-> TODO: Point out properties that CPS gives you (and properties of other transformations as well, as we cover them): all serious calls are tail calls, all arguments to calls are simple, fix order of evaluation.
+Denne måten å programmere på gir den resulterende koden en rekke fine egenskaper.
+Den første, som vi diskuterte over, er at det alltid er fullstendig **eksplisitt hvor evalueringen fortsetter**.
+Funksjoner trenger ingen implisitt kontekst der eksekveringen kan fortsette når en funksjon er ferdig med det den skal gjøre.
 
-Denne måten å programmere på gjøre en rekke ting eksplisitt, som vanligvis er implisitt i såkalt "direkte stil", den vanlige måten å programmere på. Et eksempel, nevnt over, er at det nå er eksplisitt hvor funksjonen "returnerer". Andre ting er rekkefølgen argumenter evalueres, som bestemmes av rekkefølgen på continuations, og [tail-calls](http://en.wikipedia.org/wiki/Tail_call), som nå består av å kalle en funksjon med den samme continuation en fikk inn, uendret.
+Dette gjør også vi ikke trenger å legge til kontekster på en kall-stack, ettersom **alle kall ender opp med å bli tail-calls**.
 
-Kode i CPS har også den egenskapen at koden "vrenges" inn-ut, ettersom det er de innerste uttrykkene som må evalueres først.
+En siste egenskap er at vi får en **fast definert rekkefølge uttrykk skal evalueres**. I mange språk, inkludert Scheme, er det slik at rekkefølgen for evaluering av argumenter til funksjonskall ikke er spesifisert. Gitt uttrykket `(foo (+ 1 2) (+ 3 4))` er det implementasjonsavhengig hvorvidt `(+ 1 2)` eller `(+ 3 4)` vil regnes ut først. Ved konvertering til CPS tvinges en til å ta stilling til dette, og både `(+& 1 2 (lambda (x) (+& 3 4 (lambda (y) (foo x y)))))` og `(+& 3 4 (lambda (x) (+& 1 2 (lambda (y) (foo x y)))))` er gyldig CPS og definerer en mulig rekkefølge.
 
+En ulempe er dog at koden "vrenges" inn-ut, slik at den for mange blir vanskeligere å lese.
 
-**Alt er tail-calls**
-
-Som vi så innledningsvis var den andre implementasjonen av factorial langt bedre for høye inputverdier ettersom den benyttet tail-rekursive funksjonskall, og dermed unngikk å sprenge stacken.
-
-Det interessante med kode skrevet i CPS er at, ettersom det aldri er noen implisitte continuations, er alle kall tail-kall! Dette betyr at det er mulig å mekanisk konvertere et hvert program til et annet som har samme oppførsel, men som er tail-rekursivt. Dette er en teknikk som brukes i mange kompilatorer.
-
-<!-- https://en.wikipedia.org/wiki/Continuation-passing_style#CPS_and_tail_calls -->
 
 ## Vi vender tilbake til `factorial`
 
@@ -400,6 +396,11 @@ Etter omskriving til CPS blir resultetet følgende:
 ```
 
 Klarer du å følge stegene vi brukte over, og komme frem til det samme?
+
+Vi har først lagt til argumentet `k`.
+Dernest har vi pakket begge de første `cond`-grenene inn i kall til `k`, ettersom disse er enkle uttrykk som skal "returneres".
+I den siste grenen må vi starte med det ene kallet til `fib/k`, og sende resultatet av dette videre til en continuation over resten av utregningen. Denne continuation inneholder et nytt kall til `fib/k` som vi igjen må sende videre.
+I den innereste lambdaen, som er continuation for det andre rekursive kallet, har vi tilgjengelig verdiene for både "fib av n-1" og "fib av n-2", og kan derfor gjøre oss ferdige ved å legge disse sammen.
 
 ## Oppsummering
 
