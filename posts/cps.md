@@ -45,7 +45,7 @@ Dette er den naive implementasjonen av factorial. La oss ta en titt:
 
 Kall-stacken vokser for hvert rekursive kall. Dette fungerer greit for små input, men vil sprenge stacken hvis vi forsøker å regne factorial av store tall.
 
-Ofte kan vi lage en ekvivalent implementasjon som er tail-rekursiv, noe som i språk optimalisert for tail-kall vil løse problemet. Et eksempel på en slik implementasjon vises under.
+Ofte kan vi lage en ekvivalent implementasjon som er tail-rekursiv, noe som (gitt at implementasjonen av språket en bruker er optimalisert for tail-kall) vil løse problemet. Et eksempel på en slik implementasjon vises under.
 
 ```scheme
 > (define factorial-iter
@@ -135,7 +135,7 @@ Denne idéen om å ta en *continuation* — stedet evalueringen skal fortsette �
 Programmering i CPS følger disse reglene:
 
 1. Alle funksjonssignaturer får et ekstra parameter
-1. Funksjoner returnerer ikke, men sender i stedet "returverdien" videre ved å kalle dette ekstra parameteret med "returverdien" som argument.
+1. Funksjoner returnerer ikke, men sender i stedet "returverdien" videre ved å kalle denne ekstra parameteren med "returverdien" som argument.
 
 **Eksempel: `add-double`**
 
@@ -173,7 +173,7 @@ For å teste `add-double/k` sender vi inn en passende lambda-funksjon som contin
 
 La oss gå igjennom et annet eksempel, og se på stegene en må følge for å konvertere et program som ikke bruker continuations over til CPS.
 
-Eksempelet vi tar for oss er Pythagoras formel for å regne ut hypothenus. Her er først den vanlige koden. Vi har 2 funksjoner: en hjelpefunksjon `square` for å regne ut `x * x`, og `hypo` som regner ut hypothenusen gitt lengde av to kateter.
+Eksempelet vi tar for oss er Pythagoras' formel for å regne ut hypotenus. Her er først den vanlige koden. Vi har funksjoner: en hjelpefunksjon `square` for å regne ut `x * x`, og `hypo` som regner ut hypotenusen gitt lengde av to kateter.
 
 
 ```scheme
@@ -195,7 +195,7 @@ La oss starte med å konvertere `square` til CPS og kalle denne `square/k`. For 
 > (lambda (x ...) KROPP) => (lambda (x ... k) KROPP^)
 > ```
 
-Vi vet altså at løsningen må være noe á la følgende:
+Vi vet altså at løsningen må være noe à la følgende:
 
 ```scheme
 (define square/k
@@ -229,7 +229,7 @@ Regelen for å behandle kroppen til lambda-uttrykk blir noe slikt som:
 > (f (g (h i))) => (h i (lambda (hi) (f (g hi))))
 > ```
 
-Reglen forteller oss at vi skal starte med å utføre utregningen av kvadratet av `a`. Vi gjør dette med `square/k` slik at vi kan sende inn en continuation-lambda. Parameteret `a-square` representerer verdien av utregningen så langt.
+Reglen forteller oss at vi skal starte med å utføre utregningen av kvadratet av `a`. Vi gjør dette med `square/k` slik at vi kan sende inn en continuation-lambda. Parameteren `a-square` representerer verdien av utregningen så langt.
 
 ```scheme
 (define hypo/k
@@ -285,9 +285,9 @@ Denne måten å programmere på gir den resulterende koden en rekke fine egenska
 Den første, som vi diskuterte over, er at det alltid er fullstendig **eksplisitt hvor evalueringen fortsetter**.
 Funksjoner trenger ingen implisitt kontekst der eksekveringen kan fortsette når en funksjon er ferdig med det den skal gjøre.
 
-Dette gjør at vi ikke trenger å legge til kontekster på en kall-stack, ettersom **alle kall ender opp med å bli tail-calls**. Koden får derfor konstant stack-bruk (i språk som er optimalisert for tail-kall).
+Dette gjør at vi ikke trenger å legge til kontekster på en kall-stack, ettersom **alle kall ender opp med å bli tail-calls**. Koden får derfor konstant stack-bruk (i språk-implementasjoner optimalisert for tail-kall).
 
-En siste egenskap er at vi får en **fast definert rekkefølge for uttrykk skal evalueres**. I mange språk, inkludert Scheme, er det slik at rekkefølgen for evaluering av argumenter til funksjonskall ikke er spesifisert. Gitt uttrykket `(foo (+ 1 2) (+ 3 4))` er det implementasjonsavhengig hvorvidt `(+ 1 2)` eller `(+ 3 4)` vil regnes ut først. Ved konvertering til CPS tvinges en til å ta stilling til dette. Både `(+& 1 2 (lambda (x) (+& 3 4 (lambda (y) (foo x y)))))` og `(+& 3 4 (lambda (x) (+& 1 2 (lambda (y) (foo x y)))))` er gyldig CPS og representerer de to ulike evalueringrekkefølgene.
+En siste egenskap er at vi får en **fast definert rekkefølge for når uttrykk skal evalueres**. I mange språk, inkludert Scheme, er det slik at rekkefølgen for evaluering av argumenter til funksjonskall ikke er spesifisert. Gitt uttrykket `(foo (+ 1 2) (+ 3 4))` er det implementasjonsavhengig hvorvidt `(+ 1 2)` eller `(+ 3 4)` vil regnes ut først. Ved konvertering til CPS tvinges en til å ta stilling til dette. Både `(+& 1 2 (lambda (x) (+& 3 4 (lambda (y) (foo x y)))))` og `(+& 3 4 (lambda (x) (+& 1 2 (lambda (y) (foo x y)))))` er gyldig CPS og representerer de to ulike evalueringrekkefølgene.
 
 
 ## Vi vender tilbake til `factorial`
@@ -377,7 +377,7 @@ Og for de som måtte lure på hvordan koden ville sett ut dersom vi ikke hadde v
 ## Et siste eksempel
 
 La oss avslutte med et siste eksempel. 
-I funksjoner der det gjøres 2 rekursive kall er det ofte ikke like enkelt å finne en løsning som baserer seg på bruk av en akkumulator, slik vi kunne for factorial.
+I funksjoner der det gjøres flere rekursive kall er det ofte ikke like enkelt å finne en løsning som baserer seg på bruk av en akkumulator, slik vi kunne for factorial.
 
 ```scheme
 (define fib
@@ -418,7 +418,7 @@ I eksemplene så vi hvordan det å bruke CPS som en generell taktikk for tvinge 
 
 [wiki-trampolining]: https://en.wikipedia.org/wiki/Trampoline_(computers)#High_level_programming
 
-Det er imidlertid ikke til å stikke under en stol at den resulterende transformerte koden ikke er like konsis og lettlest som utgangspunktet. Koden "vrenges" på sett og vis inn-ut. Prosessen med å konvertere programmer krever også en hel del konsentrasjon, og det er lett å gjøre feil. 
+Det er imidlertid ikke til å stikke under stol at den resulterende transformerte koden ikke er like konsis og lettlest som utgangspunktet. Koden "vrenges" på sett og vis inn-ut. Prosessen med å konvertere programmer krever også en hel del konsentrasjon, og det er lett å gjøre feil. 
 
 Dette er ikke en teknikk som vanligvis brukes manuelt av mange programmerere, men i langt større grad vanlig å bruke som steg i kompilatorer og liknende. Det er likevel morsomt å vite at en har muligheten dersom behovet skulle oppstå, og det er en viktig transformasjon å kjenne til hvis en har lyst til å lære om kompilering av høynivå språk.
 
