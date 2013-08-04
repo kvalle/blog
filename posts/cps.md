@@ -2,14 +2,16 @@
 
 Programmering—for en verden full av merkelige og fantastiske idéer og konsepter.
 I dag har jeg lyst til å skrive litt om noe jeg lærte om da jeg var på [Lambda Jam](http://lambdajam.com/)-konferansen i Chicago i sommer. 
-Der var jeg blant annet på en [workshop om program transformations](http://lambdajam.com/sessions#amin) med William Byrd og Nada Amin.
+Der var jeg blant annet på en [workshop om Program Transformations](http://lambdajam.com/sessions#amin) med [William Byrd](https://twitter.com/webyrd) og [Nada Amin](https://twitter.com/nadamin).
 Denne bloggposten omhandler noe av det aller mest grunnleggende vi gikk igjennom der.
-Det skal handle om *continuation passing style* (CPS) en måte å skrive om programmer slik at de blir fryktelig vanskelige å lese, men får noen morsomme egenskaper. 
+Det skal handle om *continuation passing style* (CPS) en måte å skrive om programmer slik at de blir slitsomme å lese, men får noen fine egenskaper. 
+
+Mer konkret skal vi se på hvordan vi med utgangspunkt i eksisterende kode kan skrive denne om slik at algoritmen bevares utendret, mens programmets behov for bruk av kall-stack elimineres.
 Dette blir teoretisk, for de aller fleste fullstendig unyttig, og forhåpentlig ganske artig (i alle fall for noen spesielt interesserte).
 
 ## Vi starter enkelt
 
-Vi starter med et meget velkjent eksempel<sup>[1](#footnote-1)</sup> for alle som noensinne har lest om (funksjonelle) programmeringspråk på internett: Factorial!
+Vi starter med en meget velkjent funksjon<sup>[1](#footnote-1)</sup> for alle som har lest (funksjonelle) kodeekesmpler på internett: Factorial!
 
 ```scheme
 > (define factorial 
@@ -41,9 +43,9 @@ Dette er den naive implementasjonen av factorial. La oss ta en titt:
 120
 ```
 
-Kall-stacken vokser for hvert rekursive kall. Dette fungerer greit for små input, men sprenger raskt stacken hvis vi forsøker å regne factorial av store tall.
+Kall-stacken vokser for hvert rekursive kall. Dette fungerer greit for små input, men vil sprenge stacken hvis vi forsøker å regne factorial av store tall.
 
-Ofte kan vi løse det ved å lage en ekvivalent implementasjon som er tail-rekursiv, gjerne ved hjelp av en hjelpe-funksjon. I tail-kall-optimaliserte språk vil dette løse problemet. Et eksempel på en slik implementasjon vises under.
+Ofte kan vi lage en ekvivalent implementasjon som er tail-rekursiv, noe som i språk optimalisert for tail-kall vil løse problemet. Et eksempel på en slik implementasjon vises under.
 
 ```scheme
 > (define factorial-iter
@@ -75,21 +77,22 @@ Igjen, la oss se på hvordan kall-stacken vokser:
 120
 ```
 
-Som vi ser, kall-stacken øker aldri! Selv ikke kallet til `factorial-iter`, som også er et tail-kall, har noen effekt. 
+Dette er oppførselen vi ønsker — kallet til `factorial` klarer seg med én enkelt stack-frame uansett hvor stor input blir.
+Men selv om denne omskrivingen fungerer bra er det dessverre slik at det i mange tilfeller være vanskelig å komme opp med en ekvivalent tail-rekursiv algoritme for problemet en har løst. 
 
-Denne omskrivingen fungerer bra. Dessverre kan det i mange tilfeller være svært vanskelig å komme opp med en ekvivalent tail-rekursiv algoritme for problemet en løser. Men fortvil ikke, det finnes en generell løsning for hvordan en kan oppnå dette. La oss først ta et par steg tilbake for å forstå et konsept vi vil få bruk for — *continuations*.
+Men fortvil ikke, det finnes en generell løsning for hvordan en kan oppnå dette. For å komme frem til denne, la oss først ta et par steg tilbake for å se på et konsept vi vil få bruk for.
 
 
 ## Continuations
 
-For å forstå continuations er det lurt å begynne enkelt. La oss starte med den kanskje enkleste funksjonen du vil se i dag: funksjonen som legger én til sitt input.
+For å forstå continuations er det lurt å begynne enkelt. La oss starte med den kanskje enkleste funksjonen du vil se i dag: Funksjonen som legger én til sitt input.
 
 ```scheme
 (define (inc n)
   (+ n 1))
 ```
 
-Det er en implisitt egenskap ved denne funksjonen som vi er så vant til at du antagelig ikke engang tenker over det: stedet verdien `n + 1` returneres til. En av hovedidéene bak continuations er å gjøre denne egenskapen eksplisitt.
+Det er en implisitt egenskap ved denne funksjonen som vi er så vant til at du antagelig ikke engang tenker over det: Stedet verdien `n + 1` returneres til. En av hovedidéene bak continuations er å gjøre denne egenskapen eksplisitt.
 
 Vi kan gjøre dette ved å, i stedet for å *returnere*, la verdien *fortsette* ved å sende den videre som argument til en annen funksjon<sup>[2](#footnote-2)</sup> — en continuation — som vi tar inn som et ekstra parameter i funksjonen.
 
@@ -98,12 +101,13 @@ Vi kan gjøre dette ved å, i stedet for å *returnere*, la verdien *fortsette* 
   (k (+ n 1)))
 ```
 
-Funksjonen `k` retpresenterer "arbeidet som gjenstår etter at funksjonen er ferdig". (Valget av av bokstven "k" om variabelnavn her er ikke tilfeldig — det er en vanlig konvensjon for å representere continuation-argumenter.)
+Funksjonen `k`<sup>[3](#footnote-3)</sup> retpresenterer "arbeidet som gjenstår etter at funksjonen er ferdig". Vi regner ut resultatet av funksjonen, og sender dette videre til resten av programmet. Tidligere ville "resten" vært hvor enn vi koden kallet til funksjonen ble foretatt, mens resten av det som skal gjøre nå er `k` sitt ansvar.
 
 En måte å tenke på continuations er som [lambda-abstraksjoner over hull i koden](https://github.com/namin/lambdajam/blob/master/cps-work.scm). Ta for eksempel følgende utrykk: 
 
 ```scheme
-(+ 1 (- 2 (+ 3 4)))
+> (+ 1 (- 2 (+ 3 4)))
+-4
 ``` 
 
 Vi ønsker å lage en continuation som representerer arbeidet som gjenstår etter at vi har regnet ut `(+ 3 4)`. Dette kan vi gjør ved å bytte `(+ 3 4)` med en variabel, for eksempel `HULL`, og pakke alt inn i en lambda-funksjon som tar inn denne variabelen.
@@ -113,8 +117,16 @@ Vi ønsker å lage en continuation som representerer arbeidet som gjenstår ette
   (+ 1 (- 2 HULL)))
 ```
 
-Denne funksjonen representerer nå evalueringen som vil gjøres etter at 3 og 4 er lagt sammen. 
+Denne lambda-funksjonen er en continuation som representerer evalueringen som vil gjøres etter at 3 og 4 er lagt sammen. Hvis vi lager oss en variant av funksjone n `+` som forventer en continuation som argument kan vi kalle denne med lambdaen og se at utregningen fortsatt er den samme.
 
+```scheme
+> (define +&
+    (lambda (x y k)
+      (k (+ x y))))
+> (+& 3 4 (lambda (HULL) 
+    (+ 1 (- 2 HULL))))
+-4
+```
 
 ## Continuation Passing Style
 
@@ -123,7 +135,7 @@ Denne idéen om å ta en *continuation* — stedet evalueringen skal fortsette �
 Programmering i CPS følger disse reglene:
 
 1. Alle funksjonssignaturer får et ekstra parameter
-1. Funksjoner returnerer ikke, men sender i stedet "returverdien" videre til som argument til dette ekstra parameteret.
+1. Funksjoner returnerer ikke, men sender i stedet "returverdien" videre ved å kalle dette ekstra parameteret med "returverdien" som argument.
 
 **Eksempel: `add-double`**
 
@@ -140,40 +152,28 @@ La oss ta for oss et enkelt eksempel. Vi begynner med følgende funksjon, `add-d
 Denne funksjonen kan skrives om som følger, for å følge continuation passing style.
 
 ```scheme
-(define add-double& 
+(define add-double/k 
   (lambda (x y k)
     (+& x y (lambda (xy)
-        (*& 2 xy k)))))
+        (k (* 2 xy))))))
 ```
 
-Legg merke til at vi først legger sammen `x` and `y`, som er det innerste uttrykket i den normale `add-double`-funksjonen. Resultatet av dette sendes til en `lambda`-continuation, som i sin tur multipliserer verdien med 2, før den "returnerer" ved å sende det endelige resultatet til `k`.
+Legg merke til at vi først legger sammen `x` and `y`, som er det innerste uttrykket i den normale `add-double`-funksjonen. Resultatet av dette sendes til en `lambda`-continuation, som i sin tur multipliserer verdien med 2, før den "returnerer" ved å sende det endelige resultatet til `k`. Vi ser også at vi har måttet bruke `+&` som vi definerte over, for å kunne sende inn en ny continuation med arbeidet som gjenstår.
 
-Vi ser også at vi ikke har kunnet bruke de vanlige versjonene av `+` and `*`, ettersom disse ikke er i CPS. I stedet har vi definert nye varianter som følger:
-
-```scheme
-(define *& 
-  (lambda (x y k)
-    (k (* x y))))
-
-(define +& 
-  (lambda x y k)
-    (k (+ x y)))
-```
-
-For å testen `add-double` sender vi en passende lambda-funksjon inn som continuation, slik at vi får fatt på resultatet. Her kommer identitetfunksjonen greit med. La oss definere denne som `empty-k`, slik at vi kan bruke den videre.
+For å teste `add-double/k` sender vi inn en passende lambda-funksjon som continuation. For å få fatt på resultatet trenger vi en funksjon som kun returnerer argumentet — altså identitetfunksjonen. La oss definere denne som `empty-k`, slik at vi kan bruke den videre.
 
 ```scheme
 > (define empty-k
     (lambda (x) x))
-> (add-double& 2 3 empty-k)
+> (add-double/k 2 3 empty-k)
 10
 ```
 
 **Fremgangsmåte**
 
-La oss gå igjennom et annet eksempel, og se på stegene en må følge for å konvertere et program i "direct style" over til CPS.
+La oss gå igjennom et annet eksempel, og se på stegene en må følge for å konvertere et program som ikke bruker continuations over til CPS.
 
-Eksempelet vi tar for oss er Pythagoras formel for å regne ut hypothenus. Her er først vanlig kode, som ikke er CPS. Vi har 2 funksjoner: `square` for å regne ut `x * x`, og `hypo` som regner ut hypothenus gitt lengde av to katet.
+Eksempelet vi tar for oss er Pythagoras formel for å regne ut hypothenus. Her er først den vanlige koden. Vi har 2 funksjoner: en hjelpefunksjon `square` for å regne ut `x * x`, og `hypo` som regner ut hypothenusen gitt lengde av to kateter.
 
 
 ```scheme
@@ -189,9 +189,11 @@ Eksempelet vi tar for oss er Pythagoras formel for å regne ut hypothenus. Her e
 
 La oss starte med å konvertere `square` til CPS og kalle denne `square/k`. For å gjøre dette benytter vi først følgende regel.
 
-> Alle lambda-uttrykk skal utvides med et ekstra argument, før en fortsetter å prosessere funksjonskroppen til lambdaen.
+> Alle lambda-uttrykk skal utvides med et ekstra argument, før en fortsetter å transformere funksjonskroppen til lambdaen.
 > 
->    `(lambda (x ...) ...) => (lambda (x ... k) ...^)`
+> ```scheme
+> (lambda (x ...) KROPP) => (lambda (x ... k) KROPP^)
+> ```
 
 Vi vet altså at løsningen må være noe á la følgende:
 
@@ -206,7 +208,7 @@ Fra før vet vi at resultatet av funksjonen sendes inn til `k`, så løsningen m
 ```scheme
 (define square/k
   (lambda (x k)
-    (k (* x x))))
+     (k (* x x))))
 ```
 
 Dette gikk greit! Vi gyver løs på `hypo/k`. Igjen vet vi, basert på regelen over, at løsningen må ha form som følger.
@@ -214,32 +216,36 @@ Dette gikk greit! Vi gyver løs på `hypo/k`. Igjen vet vi, basert på regelen o
 ```scheme
 (define hypo/k
   (lambda (a b k)
-    NOE))
+     NOE))
 ```
 
 Det neste vi må gjøre er å finne det første uttrykket som kan evalueres. I dette tilfellet kan det være enten `(square a)` eller `(square b)`, ettersom evaluerings-rekkefølgen til argumenter ikke er spesifisert i Scheme. Det er opp til oss å velge, og dermed avgjøre eksekveringsrekkefølgen. La oss bestemme at `(square a)` evalueres først.
 
 Regelen for å behandle kroppen til lambda-uttrykk blir noe slikt som:
 
-> Identifiser første uttrykk som kan evalueres.
+> Identifiser første uttrykk som kan evalueres. Utfør dette og send en continuation-lambda som siste argument. Denne lambdaen skal inneholde transformasjonen av de resterende stegene.
+> 
+> ```scheme
+> (f (g (h i))) => (h i (lambda (hi) (f (g hi))))
+> ```
 
-Vi husker å benytte den CPS-ifiserte `square/k`, og må derfor sende inn en continuation som siste argument, der vi skal implementere resten av koden. Variabelen vi sender inn `a2` representerer resultatet av føste del, kvadratet av `a`.
+Reglen forteller oss at vi skal starte med å utføre utregningen av kvadratet av `a`. Vi gjør dette med `square/k` slik at vi kan sende inn en continuation-lambda. Parameteret `a-square` representerer verdien av utregningen så langt.
 
 ```scheme
 (define hypo/k
   (lambda (a b k)
-    (square/k a (lambda (a2) 
-      NOE))))
+    (square/k a (lambda (a-square) 
+                   NOE))))
 ```
 
-Vi vet nå at det neste vi må evaluere er `(square b)`, så vi gjentar og gjør det samme med denne som vi nettopp gjorde for `(square a)`.
+Vi vet at det neste uttrykket vi må evaluere er `(square b)`, så dette er det første vi skal gjøre inne i continuation-funksjonen vi nettopp laget. Vi gjentar samme prosess som for `(square a)`.
 
 ```scheme
 (define hypo/k
   (lambda (a b k)
-    (square/k a (lambda (a2) 
-      (square/k b (lambda (b2)
-        NOE))))))
+    (square/k a (lambda (a-square) 
+                  (square/k b (lambda (b-square)
+                                NOE))))))
 ```
 
 Begge argumentene til `+` er nå evaluert og vi kan derfor kalle denne. Vi bruker den CPS-ifiserte varianten `+&` som vi definerte tidligere.
@@ -247,10 +253,10 @@ Begge argumentene til `+` er nå evaluert og vi kan derfor kalle denne. Vi bruke
 ```scheme
 (define hypo/k
   (lambda (a b k)
-    (square/k a (lambda (a2) 
-      (square/k b (lambda (b2)
-        (+& a2 b2 (lambda (a2-plus-b2)
-              NOE))))))))
+    (square/k a (lambda (a-square) 
+                  (square/k b (lambda (b-square)
+                                (+& a-square b-square (lambda (a-square-plus-b-square)
+                                                         NOE))))))))
 ```
 
 Alt som nå gjenstår er å ta kvadratroten for å få det endelige resultatet. Vi gjør dette, og sender samtidig verdien til `k`, `hypo/k` sin continuation.
@@ -258,10 +264,10 @@ Alt som nå gjenstår er å ta kvadratroten for å få det endelige resultatet. 
 ```scheme
 (define hypo/k
   (lambda (a b k)
-    (square/k a (lambda (a2) 
-      (square/k b (lambda (b2)
-        (+& a2 b2 (lambda (a2-plus-b2)
-              (k (sqrt a2-plus-b2))))))))))
+    (square/k a (lambda (a-square) 
+                  (square/k b (lambda (b-square)
+                                (+& a-square b-square (lambda (a-square-plus-b-square)
+                                                        (k (sqrt a-square-plus-b-square))))))))))
 ```
 
 Da er vi i mål! Og testing av funksjonene viser at alt fortsatt fungerer som før:
@@ -269,40 +275,38 @@ Da er vi i mål! Og testing av funksjonene viser at alt fortsatt fungerer som f�
 ```scheme
 > (hypo 3 4)
 5
-> (hypo/k 3 4 (lambda (x) x))
+> (hypo/k 3 4 empty-k)
 5
 ```
 
-## Egenskaper
+## Hva har vi oppnådd?
 
 Denne måten å programmere på gir den resulterende koden en rekke fine egenskaper.
 Den første, som vi diskuterte over, er at det alltid er fullstendig **eksplisitt hvor evalueringen fortsetter**.
 Funksjoner trenger ingen implisitt kontekst der eksekveringen kan fortsette når en funksjon er ferdig med det den skal gjøre.
 
-Dette gjør også vi ikke trenger å legge til kontekster på en kall-stack, ettersom **alle kall ender opp med å bli tail-calls**.
+Dette gjør at vi ikke trenger å legge til kontekster på en kall-stack, ettersom **alle kall ender opp med å bli tail-calls**. Koden får derfor konstant stack-bruk (i språk som er optimalisert for tail-kall).
 
-En siste egenskap er at vi får en **fast definert rekkefølge uttrykk skal evalueres**. I mange språk, inkludert Scheme, er det slik at rekkefølgen for evaluering av argumenter til funksjonskall ikke er spesifisert. Gitt uttrykket `(foo (+ 1 2) (+ 3 4))` er det implementasjonsavhengig hvorvidt `(+ 1 2)` eller `(+ 3 4)` vil regnes ut først. Ved konvertering til CPS tvinges en til å ta stilling til dette, og både `(+& 1 2 (lambda (x) (+& 3 4 (lambda (y) (foo x y)))))` og `(+& 3 4 (lambda (x) (+& 1 2 (lambda (y) (foo x y)))))` er gyldig CPS og definerer en mulig rekkefølge.
-
-En ulempe er dog at koden "vrenges" inn-ut, slik at den for mange blir vanskeligere å lese.
+En siste egenskap er at vi får en **fast definert rekkefølge for uttrykk skal evalueres**. I mange språk, inkludert Scheme, er det slik at rekkefølgen for evaluering av argumenter til funksjonskall ikke er spesifisert. Gitt uttrykket `(foo (+ 1 2) (+ 3 4))` er det implementasjonsavhengig hvorvidt `(+ 1 2)` eller `(+ 3 4)` vil regnes ut først. Ved konvertering til CPS tvinges en til å ta stilling til dette. Både `(+& 1 2 (lambda (x) (+& 3 4 (lambda (y) (foo x y)))))` og `(+& 3 4 (lambda (x) (+& 1 2 (lambda (y) (foo x y)))))` er gyldig CPS og representerer de to ulike evalueringrekkefølgene.
 
 
 ## Vi vender tilbake til `factorial`
 
-La oss ta en ny titt på det innldende eksempelet, og se hva vi kan få til med CPS. Vi starter med den opprinnelige funksjonen, definert med eksplisitt lambda, og legger til det ekstra argumentet `k`.
+La oss ta en ny titt på det innldende eksempelet, og skriver gradvis `factorial` over til CPS. Vi starter med den opprinnelige funksjonen og legger til det ekstra argumentet `k`.
 
 ```scheme
-(define factorial
+(define factorial/k
   (lambda (n k)
     (if (= n 0) 
         1
         (* n (factorial (- n 1))))))
 ```
 
-Vi tar denne gangen en litt mer pragmatisk tilnærming. Så langt har vi benyttet CPS-reglene på *alle* uttrykk i programmene. Dette er strengt tatt ikke nødvendig for *enkle uttrykk*, dvs uttrykk vi vet vil returnere umiddelbart.
+Vi tar denne gangen en litt mer pragmatisk tilnærming. Så langt har vi benyttet CPS-reglene på *alle* uttrykk i programmene. Vi har en ny regel vi kan bruke:
 
-Tidligere ville vi startet med å lage en continuation over `(= n 0)`, men siden vi vet at dette er et enkelt uttrykk lar vi det stå som det gjør.
+> *Enkle uttrykk* er uttrykk vi vet at vil returnere umiddelbart. Slike uttrykk kan få være som de er, men skal pakkes inn i kall til `k` dersom de står i fare for å evalueres som returverdi for funksjonen.
 
-Det er derimot slik at enkle uttrykk vi ikke vet hvorvidt vil bli evaluert — uttrykk vi risikerer å "returnere" — skal pakkes inn i et kall til `k` som tidligere. Vi gjør dette, og er ferdig med "then"-grenen av `if`-uttrykket:
+Tidligere ville vi startet med å lage en continuation over `(= n 0)`, predikatet i `if`-uttrykket vårt, men siden vi vet at dette er et enkelt uttrykk lar vi det stå i fred. Verdien `1` i "then"-grenen av `if`-en er også et enkelt uttrykk, men dette kan bli en returverdi fra funksjonen, så vi gjør et kall til `k`.
 
 ```scheme
 (define factorial
@@ -311,6 +315,8 @@ Det er derimot slik at enkle uttrykk vi ikke vet hvorvidt vil bli evaluert — u
         (k 1)
         (* n (factorial (- n 1))))))
 ```
+
+Vi har nå bare "else"-grenen av `if`-uttrykket igjen å transformere.
 
 Det neste uttrykket som kan utføres er `(- n 1)`. Også dette er et enkelt uttrykk, og vi lar det være som det er. Det rekursive kallet til `factorial` er derimot definitivt ikke et enkelt uttrykk. Vi bytter "else"-grenen ut med en continuation over dette kallet.
 
@@ -323,7 +329,7 @@ Det neste uttrykket som kan utføres er `(- n 1)`. Også dette er et enkelt uttr
                                 (* n fac-n-minus-1))))))
 ```
 
-Til sist må vi huske å kalle `k` i stedet for å returnere direkte:
+Alt som gjenstår nå er kallet til `*` — enda et enkelt uttrykk — så vi behøver bare å huske å kalle `k` i stedet for å returnere direkte:
 
 ```scheme
 (define factorial/k
@@ -339,7 +345,7 @@ Voilà, vi har CPSet factorial! For å sjekke at det fungerer tracer vi et kall,
 ```scheme
 > (trace factorial/k)
 (factorial/k)
-> (factorial/k 5 (lambda (x) x))
+> (factorial/k 5 empty-k)
 |(factorial/k 5 #<procedure>)
 |(factorial/k 4 #<procedure>)
 |(factorial/k 3 #<procedure>)
@@ -350,9 +356,10 @@ Voilà, vi har CPSet factorial! For å sjekke at det fungerer tracer vi et kall,
 120
 ```
 
-Sannelig, stacken oppfører seg som den alternative tail-rekursive algoritmen vi så på tidligere. Men denne gangen har vi ved hjelp av CPS fått denne oppførselen uten å endre på hvordan algoritmen fungerer.
+Som forventet, stacken oppfører seg som den alternative tail-rekursive algoritmen vi så på innledningsvis.
+Men denne gangen har vi ved hjelp av CPS fått denne oppførselen uten å endre på hvordan algoritmen fungerer.
 
-Og for de som måtte lure på hvordan koden ville sett ut dersom vi ikke hadde vært pragmatiske og latt de enkle uttrykkene være i fred, her er en fullstendig CPSet versjon, der `*&`, `-&` og `=&` er CPS-varianter av de samme operatorene.
+Og for de som måtte lure på hvordan koden ville sett ut dersom vi ikke hadde vært pragmatiske og latt de enkle uttrykkene være i fred: Her er en fullstendig CPSet versjon, der `*&`, `-&` og `=&` er CPS-varianter av de samme operatorene.
 
 ```scheme
 > (define factorial/k
@@ -362,14 +369,15 @@ Og for de som måtte lure på hvordan koden ville sett ut dersom vi ikke hadde v
                     (k 1)
                     (-& n 1 (lambda (n-minus-1) 
                               (factorial/k n-minus-1 (lambda (fact-n-minus-1)
-                                                        (*& n fact-n-minus-1 k))))))))))
-> (factorial/k 5 (lambda (x) x))
+                                                       (*& n fact-n-minus-1 k))))))))))
+> (factorial/k 5 empty-k)
 120
 ```
 
 ## Et siste eksempel
 
-La oss avslutte med et siste eksempel, et der det gjøres 2 rekursive kall, og som dermed ikke er like enkelt å løse med en akkumulator slik vi kunne for factorial.
+La oss avslutte med et siste eksempel. 
+I funksjoner der det gjøres 2 rekursive kall er det ofte ikke like enkelt å finne en løsning som baserer seg på bruk av en akkumulator, slik vi kunne for factorial.
 
 ```scheme
 (define fib
@@ -395,10 +403,10 @@ Etter omskriving til CPS blir resultetet følgende:
                                                (k (+ fib-n-minus-1 fib-n-minus-2))))))])))
 ```
 
-Klarer du å følge stegene vi brukte over, og komme frem til det samme?
+Klarer du å følge stegene vi har vært igjennom, og komme frem til den samme transformasjonen?
 
 Vi har først lagt til argumentet `k`.
-Dernest har vi pakket begge de første `cond`-grenene inn i kall til `k`, ettersom disse er enkle uttrykk som skal "returneres".
+Deretter har vi pakket begge de første `cond`-grenene inn i kall til `k`, ettersom disse er enkle uttrykk som skal "returneres".
 I den siste grenen må vi starte med det ene kallet til `fib/k`, og sende resultatet av dette videre til en continuation over resten av utregningen. Denne continuation inneholder et nytt kall til `fib/k` som vi igjen må sende videre.
 I den innereste lambdaen, som er continuation for det andre rekursive kallet, har vi tilgjengelig verdiene for både "fib av n-1" og "fib av n-2", og kan derfor gjøre oss ferdige ved å legge disse sammen.
 
@@ -406,14 +414,17 @@ I den innereste lambdaen, som er continuation for det andre rekursive kallet, ha
 
 Vi har sett at Continuation Passing Style er en måte å programmere på som gir den resulterende koden noen helt spesifikke, og ofte ettertraktede, egenskaper. Koden får en helt eksplisitt evalueringsrekkefølge, ettersom vi ikke returnerer til noen implisitte continuations er alle kall tail-calls, og alle argumenter er enkle uttrykk.
 
-I noen eksempler så vi hvordan det å bruke CPS som en generell taktikk for tvinge tail-calls førte til at programmer eksekverte med konstant størrelse på kall-stacken. Det skal også bemerkes at CPS alene ikke vil hjelpe oss med dette i språk som ikke er optimalisert for tail-kall. I slike språk kan en bruke teknikker som [trampolining][wiki-trampolining] sammen med CPS for å oppnå tilsvarende resultater.
+I eksemplene så vi hvordan det å bruke CPS som en generell taktikk for tvinge tail-calls førte til at programmer kjøres med konstant størrelse på kall-stacken. Det skal også bemerkes at CPS alene ikke vil hjelpe oss med dette i språk som ikke er optimalisert for tail-kall. I slike språk kan en imidlertid bruke teknikker som [trampolining][wiki-trampolining] sammen med CPS for å oppnå tilsvarende resultater.
 
 [wiki-trampolining]: https://en.wikipedia.org/wiki/Trampoline_(computers)#High_level_programming
 
-Prosessen med å konvertere programmer krever også en hel del konsentrasjon, og det er lett å gjøre feil. Koden "vrenges" inn-ut, og kan lett bli tung å lese. Dette er ikke en teknikk som brukes manuelt av mange programmerere, men i langt større grad av kompilatorer og liknende. Det er likevel morsomt å vite at en har muligheten dersom behovet skulle oppstå, og det er en viktig transformasjon å kjenne hvis en har lyst til å lære om kompilering av høynivå språk.
+Det er imidlertid ikke til å stikke under en stol at den resulterende transformerte koden ikke er like konsis og lettlest som utgangspunktet. Koden "vrenges" på sett og vis inn-ut. Prosessen med å konvertere programmer krever også en hel del konsentrasjon, og det er lett å gjøre feil. 
+
+Dette er ikke en teknikk som vanligvis brukes manuelt av mange programmerere, men i langt større grad vanlig å bruke som steg i kompilatorer og liknende. Det er likevel morsomt å vite at en har muligheten dersom behovet skulle oppstå, og det er en viktig transformasjon å kjenne til hvis en har lyst til å lære om kompilering av høynivå språk.
 
 
 **Fotnoter**
 
 1. <a id="footnote-1"></a>Eksemplene i denne bloggposten er kun testet i [Petite Scheme](http://www.scheme.com/petitechezscheme.html), men bruker ikke noen spesielle features, og burde fungere i de fleste scheme-interpreters. Kanskje med unntak av `trace`.
 2. <a id="footnote-2"></a>Merk at selv om (lambda-)funksjoner med ett argument er brukt for å representere continuations i disse eksemplene, så betyr ikke dette at lambdaer er den eneste mulige representasjonen. Continuation som konsept er ikke knyttet til noen enkelt representasjon.
+3. <a id="footnote-3"></a>Vi bruker `k` som variabelnavn for å representere continuation-argumentet i alle eksemplene. Dette er en vanlig konvensjon når en koder i CPS.
