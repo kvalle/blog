@@ -8,7 +8,8 @@ var fs = require('fs'),
     path = require('path'),
     _ = require('underscore'),
     colorize = require('colorize'),
-    highlight = require('highlight.js');
+    sh = require('execSync'),
+    pygmentize = require('pygments').colorize;
     
 var published_path = './posts';
 var public_path = './public';
@@ -21,11 +22,13 @@ marked.setOptions({
     langPrefix: "language-",
     highlight: function (code, lang) {
         if (lang) {
-            try {
-                return highlight.highlight (lang, code).value   
-            } catch (ex) {
-                warning("Had trouble with code block marked: " + lang);
+            fs.writeFileSync("tmpfile", code);
+            var html = sh.exec('pygmentize -f html -l '+lang+' tmpfile').stdout;
+            fs.unlink("tmpfile");
+            if (html == "Error: no lexer for alias '"+lang+"' found") {
+                return code;
             }
+            return html;
         }
         return code
     }
