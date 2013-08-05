@@ -78,7 +78,7 @@ Igjen, la oss se på hvordan kall-stacken vokser:
 ```
 
 Dette er oppførselen vi ønsker — kallet til `factorial` klarer seg med én enkelt stack-frame uansett hvor stor input blir.
-Men selv om denne omskrivingen fungerer bra er det dessverre slik at det i mange tilfeller være vanskelig å komme opp med en ekvivalent tail-rekursiv algoritme for problemet en har løst. 
+Men selv om denne omskrivingen fungerer bra er det dessverre slik at det i mange tilfeller vil være vanskelig å komme opp med en ekvivalent tail-rekursiv algoritme for problemet en har løst. 
 
 Men fortvil ikke, det finnes en generell løsning for hvordan en kan oppnå dette. For å komme frem til denne, la oss først ta et par steg tilbake for å se på et konsept vi vil få bruk for.
 
@@ -101,7 +101,7 @@ Vi kan gjøre dette ved å, i stedet for å *returnere*, la verdien *fortsette* 
   (k (+ n 1)))
 ```
 
-Funksjonen `k`<sup>[3](#footnote-3)</sup> retpresenterer "arbeidet som gjenstår etter at funksjonen er ferdig". Vi regner ut resultatet av funksjonen, og sender dette videre til resten av programmet. Tidligere ville "resten" vært hvor enn vi koden kallet til funksjonen ble foretatt, mens resten av det som skal gjøre nå er `k` sitt ansvar.
+Funksjonen `k`<sup>[3](#footnote-3)</sup> retpresenterer "arbeidet som gjenstår etter at funksjonen er ferdig". Vi regner ut resultatet av funksjonen, og sender dette videre til resten av programmet. Tidligere ville "resten" vært hvor enn i koden kallet til funksjonen ble foretatt, mens resten av det som skal gjøre nå er `k` sitt ansvar.
 
 En måte å tenke på continuations er som [lambda-abstraksjoner over hull i koden](https://github.com/namin/lambdajam/blob/master/cps-work.scm). Ta for eksempel følgende utrykk: 
 
@@ -117,7 +117,7 @@ Vi ønsker å lage en continuation som representerer arbeidet som gjenstår ette
   (+ 1 (- 2 HULL)))
 ```
 
-Denne lambda-funksjonen er en continuation som representerer evalueringen som vil gjøres etter at 3 og 4 er lagt sammen. Hvis vi lager oss en variant av funksjone n `+` som forventer en continuation som argument kan vi kalle denne med lambdaen og se at utregningen fortsatt er den samme.
+Denne lambda-funksjonen er en continuation som representerer evalueringen som vil gjøres etter at 3 og 4 er lagt sammen. Hvis vi lager oss en variant av funksjonen `+` som forventer en continuation som argument kan vi kalle denne med lambdaen og se at utregningen fortsatt er den samme.
 
 ```scheme
 > (define +&
