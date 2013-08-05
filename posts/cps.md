@@ -117,7 +117,7 @@ Vi ønsker å lage en continuation som representerer arbeidet som gjenstår ette
   (+ 1 (- 2 HULL)))
 ```
 
-Denne lambda-funksjonen er en continuation som representerer evalueringen som vil gjøres etter at 3 og 4 er lagt sammen. Hvis vi lager oss en variant av funksjone n `+` som forventer en continuation som argument kan vi kalle denne med lambdaen og se at utregningen fortsatt er den samme.
+Denne lambda-funksjonen er en continuation som representerer evalueringen som vil gjøres etter at 3 og 4 er lagt sammen. Hvis vi lager oss en variant av funksjonen `+` som forventer en continuation som argument kan vi kalle denne med lambdaen og se at utregningen fortsatt er den samme.
 
 ```scheme
 > (define +&
