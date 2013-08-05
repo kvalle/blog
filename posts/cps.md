@@ -78,7 +78,7 @@ Igjen, la oss se på hvordan kall-stacken vokser:
 ```
 
 Dette er oppførselen vi ønsker — kallet til `factorial` klarer seg med én enkelt stack-frame uansett hvor stor input blir.
-Men selv om denne omskrivingen fungerer bra er det dessverre slik at det i mange tilfeller være vanskelig å komme opp med en ekvivalent tail-rekursiv algoritme for problemet en har løst. 
+Men selv om denne omskrivingen fungerer bra er det dessverre slik at det i mange tilfeller vil være vanskelig å komme opp med en ekvivalent tail-rekursiv algoritme for problemet en har løst. 
 
 Men fortvil ikke, det finnes en generell løsning for hvordan en kan oppnå dette. For å komme frem til denne, la oss først ta et par steg tilbake for å se på et konsept vi vil få bruk for.
 
