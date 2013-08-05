@@ -101,7 +101,7 @@ Vi kan gjøre dette ved å, i stedet for å *returnere*, la verdien *fortsette* 
   (k (+ n 1)))
 ```
 
-Funksjonen `k`<sup>[3](#footnote-3)</sup> retpresenterer "arbeidet som gjenstår etter at funksjonen er ferdig". Vi regner ut resultatet av funksjonen, og sender dette videre til resten av programmet. Tidligere ville "resten" vært hvor enn vi koden kallet til funksjonen ble foretatt, mens resten av det som skal gjøre nå er `k` sitt ansvar.
+Funksjonen `k`<sup>[3](#footnote-3)</sup> retpresenterer "arbeidet som gjenstår etter at funksjonen er ferdig". Vi regner ut resultatet av funksjonen, og sender dette videre til resten av programmet. Tidligere ville "resten" vært hvor enn i koden kallet til funksjonen ble foretatt, mens resten av det som skal gjøre nå er `k` sitt ansvar.
 
 En måte å tenke på continuations er som [lambda-abstraksjoner over hull i koden](https://github.com/namin/lambdajam/blob/master/cps-work.scm). Ta for eksempel følgende utrykk: 
 
