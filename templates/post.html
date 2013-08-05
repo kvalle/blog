@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8" />
-	<title><%= post.title %> | Kjetil Valle</title>
-	<link rel="stylesheet" href="/css/bootstrap.css" />
-	<link rel="stylesheet" href="/css/bootstrap-responsive.css" />
+    <meta charset="utf-8" />
+    <title><%= post.title %> | Kjetil Valle</title>
     <link rel="stylesheet" href="/css/font-awesome.min.css">
     <!--[if IE 7]>
     <link rel="stylesheet" href="/css/font-awesome-ie7.min.css">
     <![endif]-->
-	<link rel="stylesheet" href="/css/highlight.css" />
-    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/highlight.css" />
+    <link rel="stylesheet" href="/css/github.css" />
 
     <script type="text/javascript">
       var _gaq = _gaq || [];
@@ -23,25 +21,33 @@
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
       })();
     </script>
+    <style>
+        .header {
+            display: block;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .header .name {
+            font-size: 24px;
+            color: #666;
+        }
+        .header .name i {
+            color: #E3E3E3;
+        }
+        .header .name:hover i {
+            color: #AAA;
+        }
+    </style>
 </head>
 <body>
-	<div id="container" class="blogpost">
-        <div class="row">
-            <div class="offset2 span8" style="text-align: center">
-                <a href="/index.html">
-                	<h2 style="display: inline-block;">
-                		<i class="icon-double-angle-left"></i>
-                		Kjetil Valle
-                	</h2>
-                	<%= post.date_string %>
-                </a>
-            </div>
-        </div>
-		<div class="row">
-			<div class="offset2 span8 content">
-				<%= post.markdown %>
-			</div>
-		</div>
-	</div>
+    <a href="/index.html" class="header">
+        <span class="name">
+            <i class="angle icon-double-angle-left"></i>
+            Kjetil Valle
+        </span>
+        <%= post.date_string %>
+    </a>
+    <%= post.markdown %>
 </body>
 </html>
