@@ -9,7 +9,9 @@ var fs = require('fs'),
     _ = require('underscore'),
     colorize = require('colorize'),
     sh = require('execSync'),
-    pygmentize = require('pygments').colorize;
+    pygmentize = require('pygments').colorize,
+    util = require('util');
+
     
 var published_path = './posts';
 var public_path = './public';
@@ -18,21 +20,13 @@ var posts_path = public_path + '/posts';
 var post_template = _.template(fs.readFileSync('templates/post.html', 'utf-8'));
 var index_template = _.template(fs.readFileSync('templates/index.html', 'utf-8'));
 
-marked.setOptions({
-    langPrefix: "language-",
-    highlight: function (code, lang) {
-        if (lang) {
-            fs.writeFileSync("tmpfile", code);
-            var html = sh.exec('pygmentize -f html -l '+lang+' tmpfile').stdout;
-            fs.unlink("tmpfile");
-            if (html == "Error: no lexer for alias '"+lang+"' found") {
-                return code;
-            }
-            return html;
-        }
-        return code
+var markedOptions = {
+    highlight: function (code, lang, callback) {
+        return pygmentize(null, code, lang, function(data) {
+            callback(null, data);
+        });
     }
-});
+};
 
 function success(filename) {
     console.log(colorize.ansify('#green[\u2713] %s'), filename)
@@ -98,7 +92,11 @@ function processPostData(metadata_file) {
         try {
             var md_file = published_path + '/' + metadata_file + '.md';
             var text = fs.readFileSync(md_file, 'utf-8');
-            post['markdown'] = marked(text);
+            post['markdown'] = marked(text, markedOptions, function(err, html) {
+                console.log(html);
+                // må gjøre noe fornuftig med html i callbacket
+            });
+            // post['markdown'] blir undefined
         } catch (ex) {
             failure(md_file, "Could not parse markdown.");
             return false;
@@ -115,7 +113,7 @@ function processPostData(metadata_file) {
     return post;
 }
 
-function createIndexPage(posts)  {
+function createIndexPage(posts) {
     var sortedPosts = posts.sort(function(p1, p2) {return (p2.date - p1.date)});
     var html = index_template({blogposts : sortedPosts})
     var path = public_path+'/index.html'

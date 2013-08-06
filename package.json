@@ -4,7 +4,7 @@
 	"version" : "0.0.1", 
 	"dependencies" : { 
 		"colorize": "~0.1",
-		"marked": "~0.2",
+		"marked": "~0.2.9",
 		"underscore": "~1.4",
 		"highlight.js": "~7.3",
 		"js-yaml": "~2.1"
