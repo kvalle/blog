@@ -1,3 +1,0 @@
-date: 2011-10-31
-title: Working with text encoding from the command line
-description: "Everyone has a horror story about text encoding. Fortunately, in many cases all you need is the command line and two simple commands: `file` and `iconv`."
