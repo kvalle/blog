@@ -8,7 +8,7 @@ var fs = require('fs'),
     path = require('path'),
     _ = require('underscore'),
     colorize = require('colorize'),
-    pygmentize = require('pygments').colorize,
+    pygmentize = require('pygmentize-bundled'),
     util = require('util'),
     promises = require("node-promise");
     
@@ -19,11 +19,13 @@ var posts_path = public_path + '/posts';
 var post_template = _.template(fs.readFileSync('templates/post.html', 'utf-8'));
 var index_template = _.template(fs.readFileSync('templates/index.html', 'utf-8'));
 
+var pygmentize = require('pygmentize-bundled')
+
 var markedOptions = {
     highlight: function (code, lang, callback) {
-        pygmentize(code, lang, 'html', function(data) {
-            callback(null, data);
-        });
+        pygmentize({ lang: lang, format: 'html' }, code, function (err, result) {
+            callback(err, result);
+        })
     }
 };
 
