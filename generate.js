@@ -8,7 +8,6 @@ var fs = require('fs'),
     path = require('path'),
     _ = require('underscore'),
     colorize = require('colorize'),
-    sh = require('execSync'),
     pygmentize = require('pygments').colorize,
     util = require('util'),
     promises = require("node-promise");
