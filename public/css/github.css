@@ -361,7 +361,7 @@ span.float-right > span {
     border-radius: 3px;
 }
 
-code, tt {
+p code {
     margin: 0 2px;
     padding: 0 5px;
     white-space: nowrap;
