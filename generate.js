@@ -10,7 +10,8 @@ var fs = require('fs'),
     colorize = require('colorize'),
     pygmentize = require('pygmentize-bundled'),
     util = require('util'),
-    promises = require("node-promise");
+    promises = require("node-promise"),
+    S = require('string');
     
 var published_path = './posts';
 var public_path = './public';
@@ -18,6 +19,7 @@ var posts_path = public_path + '/posts';
 
 var post_template = _.template(fs.readFileSync('templates/post.html', 'utf-8'));
 var index_template = _.template(fs.readFileSync('templates/index.html', 'utf-8'));
+var atom_template = _.template(fs.readFileSync('templates/atom.xml', 'utf-8'));
 
 var pygmentize = require('pygmentize-bundled')
 
@@ -41,31 +43,11 @@ function failure(filename, error) {
     console.log(colorize.ansify('#red[\u203D] %s\n  \u21D2 %s'), filename, error)
 }
 
-function title_from_filename(base) {
-    title = base.replace(/-/g, " ");
-    return title[0].toUpperCase() + title.slice(1);
-}
-
 function removeOldHtmlFiles() {
     fs.unlinkSync(public_path + '/index.html');
     _.each(fs.readdirSync(posts_path), function(file) {
         if (path.extname(file) == ".html") {
             fs.unlinkSync(posts_path + '/' + file);
-        }
-    });
-}
-
-function writePostAsHtml(post) {
-    if (!post) {
-        return;
-    }
-    var base = post.filename;
-    var html = post_template({post : post});
-    fs.writeFile(posts_path+'/'+base+'.html', html, function(err) {
-        if (err) {
-            failure(post.filename, err);
-        } else {
-            success(post.filename);
         }
     });
 }
@@ -99,7 +81,8 @@ function processPostData(metadata_file) {
     
     post['filename'] = path.basename(metadata_file, '.yml');
     post['date_string'] = post.date.toDateString();
-    post['title'] = post.title || title_from_filename(post.filename);
+    var title = post.title || S(post.filename).humanize().s;
+    post['title'] = S(title).escapeHTML().s;
     post['href'] = post.external || '/posts/'+ post.filename +'.html'
     if (post.description) {
         post['description'] = marked(post.description);
@@ -124,14 +107,39 @@ function processPostData(metadata_file) {
     return promise;
 }
 
-function createIndexPage(posts) {
-    posts = _.filter(posts, _.identity);
-    var sortedPosts = posts.sort(function(p1, p2) {return (p2.date - p1.date)});
+function createIndexPage(sortedPosts) {
     var html = index_template({blogposts : sortedPosts})
     var path = public_path+'/index.html'
     fs.writeFile(path, html, function(err) {
-        if (err) throw err;
-        success("index page");
+        if (err) {
+            failure("index page", err);
+        } else {
+            success("index page");
+        }
+    });
+}
+
+function createAtomFeed(sortedPosts) {
+    var html = atom_template({blogposts : sortedPosts})
+    var path = public_path+'/atom.xml'
+    fs.writeFile(path, html, function(err) {
+        if (err) {
+            failure("atom feed", err);
+        } else {
+            success("atom feed");
+        }
+    });
+}
+
+function writePostAsHtml(post) {
+    var html = post_template({post : post});
+    var base = post.filename;
+    fs.writeFile(posts_path+'/'+base+'.html', html, function(err) {
+        if (err) {
+            failure(post.filename, err);
+        } else {
+            success(post.filename);
+        }
     });
 }
 
@@ -142,7 +150,10 @@ function createIndexPage(posts) {
     });
     var allPostsPromise = promises.all(listOfPromises);
     allPostsPromise.then(function(posts) {
-        _.each(posts, writePostAsHtml);
-        createIndexPage(posts);
+        posts = _.filter(posts, _.identity);
+        sortedPosts = posts.sort(function(p1, p2) {return (p2.date - p1.date)});
+        _.each(sortedPosts, writePostAsHtml);
+        createIndexPage(sortedPosts);
+        createAtomFeed(sortedPosts);
     });
 })();

@@ -9,7 +9,8 @@
 		"highlight.js": "~7.3",
 		"js-yaml": "~2.1",
 		"node-promise": "0.5.8",
-		"pygmentize-bundled": "~1.2"
+		"pygmentize-bundled": "~1.2",
+		"string": "~1.5"
 	},
 	"main": "generate.js",
 	"private": true

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+ 
+<title>kjetilvalle.com</title>
+    <link href="http://kjetilvalle.com/"/>
+    <updated>TODO</updated>
+    <id>http://kjetilvalle.com/</id>
+    <author>
+        <name>Kjetil Valle</name>
+        <email>kjetil.valle@gmail.com</email>
+    </author>
+
+    <% _.each(blogposts, function(post) { %>
+    <entry>
+        <id>kjetilvalle.com#<%= post.filename %></id>
+        <link type="text/html" rel="alternate" href="http://kjetilvalle.com/<%= post.href %>"/>
+        <title><%= post.title %></title>
+        <updated><%= post.date.toISOString() %></updated>
+        <author>
+            <name>Kjetil Valle</name>
+            <uri>http://kjetilvalle.com/</uri>
+        </author>
+        <content type="html">
+            <%= post.description %>
+            <a href="http://kjetilvalle.com/<%= post.href %>">...</a>
+        </content>
+    </entry>
+    <% }); %>
+ 
+</feed>
