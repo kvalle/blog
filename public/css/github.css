@@ -369,3 +369,7 @@ p code, li code, h2 code, h3 code {
     background-color: #f8f8f8;
     border-radius: 3px;
 }
+
+body > pre {
+    white-space: normal;
+}
