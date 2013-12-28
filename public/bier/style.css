@@ -1,0 +1,98 @@
+@import url(http://fonts.googleapis.com/css?family=Droid+Serif);
+@import url(http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+
+body {
+  font-family: 'Droid Serif';
+  font-size: 20px;
+}
+
+h1, h2, h3 {
+  font-family: 'Yanone Kaffeesatz';
+  font-weight: 400;
+  margin-bottom: 0;
+  color: #f3f3f3;
+  line-height: 0.8em;
+}
+
+h1 { font-size: 4em; }
+h2 { font-size: 2em; }
+
+body {
+  background: #272822;
+  color: #777872;
+}
+
+#kart img, #slides img {
+  opacity: 0.3;
+}
+
+#kart, #slides {
+  position: relative;
+  height: 300px;
+}
+
+#kart:hover img, #slides:hover img {
+  opacity: 1;
+}
+
+#kart:hover h2, #slides:hover h2 {
+  display: none;
+}
+
+#kart img, #slides img {
+  z-index: -1;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#kart h2, #slides h2 {
+  text-align: center;
+  vertical-align: middle;
+  line-height: 190px;
+  color: #eee;
+  font-size: 3em;
+}
+
+@media (min-width: 850px) {
+  #container {
+    margin: 0 auto 0 auto;
+    max-width: 800px;
+  }
+
+  #slides {
+    float: left;
+    width: 47%;
+  }
+
+  #kart {
+    float: right;
+    width: 47%;
+  }
+}
+
+@media (max-width: 850px) and (min-width: 500px) {
+  #container {
+    margin: 0 auto 0 auto;
+    max-width: 460px;
+  }
+
+  #slides, #kart {
+    float: left;
+    width: 450px;
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 500px) {
+  #container {
+    margin: 0 auto 0 auto;
+  }
+ 
+  #slides, #kart {
+    float: left;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+}
