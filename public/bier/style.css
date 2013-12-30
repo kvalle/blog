@@ -17,6 +17,20 @@ h1, h2, h3 {
 h1 { font-size: 4em; }
 h2 { font-size: 2em; }
 
+a, a > code {
+  color: rgb(249, 38, 114);
+  text-decoration: none;
+}
+
+code {
+  background: #e7e8e2;
+  -moz-border-radius: 2px;
+  -web-border-radius: 2px;
+  border-radius: 2px;
+  font-size: 16px;
+  padding: 2px;
+}
+
 body {
   background: #272822;
   color: #777872;
@@ -64,11 +78,13 @@ body {
   #slides {
     float: left;
     width: 47%;
+    margin-bottom: 20px;
   }
 
   #kart {
     float: right;
     width: 47%;
+    margin-bottom: 20px;
   }
 }
 
