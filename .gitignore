@@ -1,3 +1,6 @@
 node_modules/
 public/index.html
 public/atom.xml
+
+# should symlink to folder with actual content
+posts
