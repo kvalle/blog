@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd public
-python -m SimpleHTTPServer &
+python -m SimpleHTTPServer 4321 &
 trap "kill $!" SIGINT SIGTERM
 cd ..
 
