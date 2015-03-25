@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 
+HOST="kjetilvalle.com"
+
 ./generate.js
-rsync -avz --delete -e ssh public/ kjetil@kjetilvalle.com:/home/kjetil/web/blog/
+rsync -avz --delete -e ssh public/ "kjetil@${HOST}:/var/www/blog/"
