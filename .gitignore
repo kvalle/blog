@@ -1,6 +1,7 @@
 node_modules/
 public/index.html
 public/atom.xml
+.vagrant
 
 # should symlink to folder with actual content
 posts
