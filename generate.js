@@ -44,7 +44,10 @@ function failure(filename, error) {
 }
 
 function removeOldHtmlFiles() {
-    fs.unlinkSync(public_path + '/index.html');
+    var index = public_path + '/index.html';
+    if (fs.existsSync(index)) {
+        fs.unlinkSync(index);
+    }
     _.each(fs.readdirSync(posts_path), function(file) {
         if (path.extname(file) == ".html") {
             fs.unlinkSync(posts_path + '/' + file);
@@ -100,7 +103,6 @@ function processPostData(metadata_file) {
             promise.resolve(post);
         });
     } else {
-        //failure(post.filename, "later som om noe gikk galt her");
         promise.resolve(post);
     }
 
