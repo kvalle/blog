@@ -146,7 +146,9 @@ function writePostAsHtml(post) {
 }
 
 (function main() {
+    success("cleaning up...");
     removeOldHtmlFiles();
+    success("generating...");
     var listOfPromises = _.map(listPostFilesSync(), function(filename) {
         return processPostData(filename);
     });
