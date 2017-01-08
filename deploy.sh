@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
 
-HOST="kjetilvalle.com"
-
 ./generate.js
-rsync -avz --delete -e ssh public/ "kjetil@${HOST}:/var/www/blog/"
+s3cmd --delete-removed --config=./.s3cfg sync public/ s3://kjetilvalle.com
